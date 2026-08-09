@@ -1,0 +1,11 @@
+{
+  "name": "hoangluongtran-dev",
+  "private": true,
+  "description": "PostCSS pipeline deps cho Hugo Pipes (resources.PostCSS) — không có build script riêng, Netlify tự chạy npm install trước build.command.",
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "cssnano": "^7.0.6",
+    "postcss": "^8.4.49",
+    "postcss-cli": "^11.0.0"
+  }
+}

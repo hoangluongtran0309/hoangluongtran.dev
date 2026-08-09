@@ -1,0 +1,12 @@
+---
+title: "Sample post 5"
+date: 2026-07-28T09:00:00+07:00
+tags: ["sample"]
+summary: "Dummy content (not a real post), used to check pagination and the multi-post list UI."
+draft: false
+---
+
+= Sample post 5
+
+This is *sample* post number 5 (dummy content, not real) — used only to
+fill out the post list for testing pagination and the multi-post list UI.

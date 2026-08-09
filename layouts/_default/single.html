@@ -1,0 +1,11 @@
+{{ define "main" }}
+<article class="content">
+  <h1>{{ .Title }}</h1>
+  {{ if ne .Type "page" }}
+    <p class="meta-row">
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "02 Jan 2006" }}</time>
+    </p>
+  {{ end }}
+  {{ .Content }}
+</article>
+{{ end }}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    // Set data-theme trước khi CSS/parse tiếp để tránh flash sai theme khi
+    // user đã từng bấm nút dark-mode toggle (partials/header.html,
+    // assets/js/main.js). Không có lựa chọn lưu -> để CSS tự quyết theo
+    // prefers-color-scheme (assets/scss/main.scss), site vẫn đúng nếu JS tắt.
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        if (saved === "light" || saved === "dark") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  {{/*
+    Trang 404: Hugo tự gán .Title = "Page not found" (hardcoded tiếng Anh,
+    Kind="404") bất kể ngôn ngữ — phát hiện khi test kỹ redirect rule EN
+    404, tab title vẫn tiếng Anh dù <h1> đã đúng qua i18n. Dùng
+    notFoundTitle thay .Title riêng cho Kind này.
+  */}}
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else if eq .Kind "404" }}{{ i18n "notFoundTitle" }} — {{ .Site.Title }}{{ else }}{{ .Title }} — {{ .Site.Title }}{{ end }}</title>
+  <link rel="canonical" href="{{ .Permalink }}">
+  {{/*
+    hreflang: .AllTranslations bao gồm cả trang hiện tại (self-reference) —
+    đúng chuẩn hreflang, không cần loại trừ. x-default trỏ literal "vi"
+    (khớp defaultContentLanguage trong hugo.toml) qua hugo.Sites (không
+    dùng .Site.Sites — deprecated từ Hugo 0.156.0, xem
+    layouts/partials/language-switcher.html cho cùng bài học).
+  */}}
+  {{ range .AllTranslations }}
+    <link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}">
+  {{ end }}
+  {{ range hugo.Sites }}
+    {{ if eq .Language.Lang "vi" }}<link rel="alternate" hreflang="x-default" href="{{ .Home.Permalink }}">{{ end }}
+  {{ end }}
+  {{ with .Params.summary | default .Summary }}<meta name="description" content="{{ . | plainify }}">{{ end }}
+  {{ $keywords := .Params.tags | default slice }}
+  {{ with $keywords }}<meta name="keywords" content="{{ delimit . ", " }}">{{ end }}
+  <link rel="icon" type="image/svg+xml" href="/{{ .Site.Params.favicon }}">
+  {{/*
+    Luôn trỏ về feed blog (chỉ section có RSS thật — xem hugo.toml
+    [outputs] + content/blog/_index.*.adoc), không phụ thuộc trang hiện
+    tại có OutputFormats "rss" hay không như trước (chỉ home/section mới
+    có, không có trên trang bài viết đơn lẻ). relLangURL để ra đúng
+    /en/blog/index.xml ở bản tiếng Anh, giống cách site xử lý URL đa
+    ngôn ngữ ở nơi khác (vd language-switcher.html).
+  */}}
+  <link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "blog/index.xml" | relLangURL }}">
+
+
+  {{ partial "opengraph/opengraph.html" . }}
+  {{ partial "opengraph/twitter-cards.html" . }}
+
+  {{ $css := resources.Get "scss/main.scss" | css.Sass }}
+  {{ $css = $css | css.PostCSS | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+
+  {{ if eq (getenv "HUGO_ENV") "production" }}
+    {{ partial "google-analytics.html" . }}
+  {{ end }}
+</head>
+<body>
+  {{ partial "header.html" . }}
+  <main class="container">
+    {{ block "main" . }}{{ end }}
+  </main>
+  {{ partial "footer.html" . }}
+
+  {{ $js := resources.Get "js/main.js" | minify | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+</body>
+</html>

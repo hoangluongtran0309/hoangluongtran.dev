@@ -1,0 +1,109 @@
+# English UI strings. Mirrors i18n/vi.toml key-for-key — every key here
+# MUST have a matching key there. See CLAUDE.md §4 invariant #9 (every UI
+# string goes through i18n/*.toml, no hardcoded text in templates).
+# Wired into templates in Step 3b (separate commit) — this file is data
+# only, no call sites reference it yet.
+
+[themeToggleLabelDark]
+other = "Switch to dark theme"
+
+[themeToggleLabelLight]
+other = "Switch to light theme"
+
+[themeToggleLabelDefault]
+other = "Toggle light/dark theme"
+
+[tags]
+other = "Tags"
+
+[readingTime]
+other = "min read"
+
+[draft]
+other = "DRAFT"
+
+[breadcrumbBlog]
+other = "blog"
+
+[searchPlaceholder]
+other = "Search articles…"
+
+[searchHint]
+other = "Type to search — try"
+
+[searchResultsHeading]
+other = "Search results"
+
+# {query} token is replaced by assets/js/main.js at runtime — not a Hugo
+# template var, keep it literal when translating.
+[searchResultsFor]
+other = "Results for “{query}”"
+
+[searchNoResultsFor]
+other = "No results for “{query}”"
+
+[recentPostsHeading]
+other = "Recent posts"
+
+[blogArchiveHeading]
+other = "All articles"
+
+[articleCount]
+one = "{{ .Count }} article"
+other = "{{ .Count }} articles"
+
+[showingXofY]
+other = "showing {{ .Count }} of {{ .Total }}"
+
+[browseArchive]
+other = "Browse the full archive →"
+
+[previousArticle]
+other = "← Previous"
+
+[nextArticle]
+other = "Next →"
+
+[tagPageTitle]
+other = "Tag: {{ .Tag }}"
+
+[notFoundTitle]
+other = "404 — Page not found"
+
+[notFoundHome]
+other = "Back to home"
+
+[paginatorNewer]
+other = "← Newer"
+
+[paginatorOlder]
+other = "Older →"
+
+[newsletterHeading]
+other = "Get new posts in your inbox"
+
+[newsletterBody]
+other = "Whenever there's a new post about Spring Boot, system architecture, or technical notes, it lands straight in your inbox."
+
+[newsletterEmailLabel]
+other = "Email address"
+
+[newsletterEmailPlaceholder]
+other = "you@example.com"
+
+[newsletterSubmit]
+other = "Subscribe"
+
+[newsletterFinePrint]
+other = "No spam, your email is never shared. Unsubscribe anytime."
+
+# Honeypot field label — never shown to real users (hidden via CSS
+# .hidden), still routed through i18n per invariant #9.
+[newsletterHoneypotLabel]
+other = "Leave this field blank if you are human"
+
+[noTranslationYet]
+other = "Not translated yet"
+
+[languageSwitcherLabel]
+other = "Choose language"

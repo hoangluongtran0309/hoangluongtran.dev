@@ -1,0 +1,10 @@
+---
+title: "Subscribed!"
+type: "page"
+draft: false
+---
+
+Thanks for subscribing to new posts. From now on, you'll get an email
+whenever a new post goes live.
+
+link:/en/[← Back to home]

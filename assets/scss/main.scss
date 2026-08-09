@@ -1,0 +1,1602 @@
+// Self-hosted fonts (Liberation Serif/Sans/Mono — SIL OFL, đầy đủ glyph
+// Latin+Vietnamese, không phải font của wimdeblauwe.com). Lần trước 2 font
+// self-host "Bitter"/"Source Sans 3" bị hỏng (chỉ ~96-202 glyph, thiếu
+// 60-80% bảng chữ) mà không ai biết vì nhúng thẳng base64 khổng lồ ngay
+// trong file SCSS — khó mở ra kiểm tra. Lần này học đúng CÁCH LÀM (không
+// phải font) từ _reference/wimdeblauwe-com: mỗi weight/style là 1 file
+// .woff2 riêng trong static/fonts/ (url() thường, không base64), dễ
+// inspect/replace độc lập; bản .ttf đầy đủ (không subset) riêng trong
+// assets/fonts/ chỉ dùng cho social-card (partials/opengraph/get-featured
+// -image.html, images.Text cần TTF thô). Đã verify glyph coverage đầy đủ
+// Latin+Vietnamese cho cả 6 file trước khi dùng (xem OFL-Liberation.txt
+// — cùng giấy phép, cùng nguồn font hệ thống local, khác actual font family
+// với lần trước để tránh lặp lại đúng lỗi cũ).
+@font-face {
+  font-family: "Liberation Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/liberation-sans-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Liberation Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/liberation-sans-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Liberation Sans";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/liberation-sans-400-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Liberation Serif";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/liberation-serif-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Liberation Serif";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/liberation-serif-700-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Liberation Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/liberation-mono-400.woff2") format("woff2");
+}
+
+// ---------------------------------------------------------------------------
+// Design tokens
+// ---------------------------------------------------------------------------
+:root {
+  --color-bg: #f7f8f5;
+  --color-surface: #eef1e9; // admonition/inline-code/literalblock bg, table stripe
+  --color-surface-2: #e4e9dc; // newsletter card, slightly deeper
+  --color-text: #1a2e1a;
+  --color-muted: #5b6b57;
+  --color-accent: #15803d;
+  --color-accent-strong: #14532d; // link/button hover
+  --color-on-accent: #f3faf4; // text/icon color sitting on top of --color-accent
+  --color-border: #dce3d6;
+  --color-tag-bg: rgba(21, 128, 61, 0.12);
+  --color-tag-text: #14532d;
+
+  // Admonition semantics — deliberately distinct from --color-accent so
+  // NOTE/WARNING/TIP stay readable as 3 different signals, not 3 shades of
+  // the same brand color. Rouge source-highlighter code blocks use their
+  // own github light/dark theme instead of these tokens — see the "Rouge
+  // syntax highlighting" section below for why.
+  --color-note: var(--color-accent);
+  --color-warning: #a16207;
+  --color-tip: #c2410c;
+
+  --font-heading: "Liberation Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "Liberation Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Liberation Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --max-width: 42rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #131a11;
+    --color-surface: #1b2418;
+    --color-surface-2: #212c1d;
+    --color-text: #e9f0e6;
+    --color-muted: #a8b8a2;
+    --color-accent: #4ade80;
+    --color-accent-strong: #86efac;
+    --color-on-accent: #0d2210;
+    --color-border: #33422e;
+    --color-tag-bg: rgba(74, 222, 128, 0.16);
+    --color-tag-text: #86efac;
+    --color-warning: #facc15;
+    --color-tip: #fb923c;
+  }
+}
+
+// Explicit override for the dark-mode toggle (assets/js/main.js sets
+// data-theme on <html>), independent of prefers-color-scheme so a manual
+// choice always wins over the OS setting, in both directions.
+:root[data-theme="dark"] {
+  --color-bg: #131a11;
+  --color-surface: #1b2418;
+  --color-surface-2: #212c1d;
+  --color-text: #e9f0e6;
+  --color-muted: #a8b8a2;
+  --color-accent: #4ade80;
+  --color-accent-strong: #86efac;
+  --color-on-accent: #0d2210;
+  --color-border: #33422e;
+  --color-tag-bg: rgba(74, 222, 128, 0.16);
+  --color-tag-text: #86efac;
+  --color-warning: #facc15;
+  --color-tip: #fb923c;
+}
+
+:root[data-theme="light"] {
+  --color-bg: #f7f8f5;
+  --color-surface: #eef1e9;
+  --color-surface-2: #e4e9dc;
+  --color-text: #1a2e1a;
+  --color-muted: #5b6b57;
+  --color-accent: #15803d;
+  --color-accent-strong: #14532d;
+  --color-on-accent: #f3faf4;
+  --color-border: #dce3d6;
+  --color-tag-bg: rgba(21, 128, 61, 0.12);
+  --color-tag-text: #14532d;
+  --color-warning: #a16207;
+  --color-tip: #c2410c;
+}
+
+// ---------------------------------------------------------------------------
+// Base
+// ---------------------------------------------------------------------------
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+// <main class="container"> (layouts/_default/baseof.html) dùng lại class
+// .container chỉ để căn max-width/lề ngang — .container gốc không có
+// padding dọc (header/footer tự set padding-top/bottom riêng cho khối
+// .container lồng bên trong chúng). Thiếu padding-bottom ở đây khiến nội
+// dung cuối trang (vd .newsletter ở blog single) dính sát vào border-top
+// của footer. Thêm riêng cho main, không đụng .container dùng ở nơi khác.
+main.container {
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+// ---------------------------------------------------------------------------
+// Header / footer
+// ---------------------------------------------------------------------------
+.site-header {
+  border-bottom: 1px solid var(--color-border);
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .site-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-text);
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+
+  nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    position: relative;
+    color: var(--color-muted);
+    padding-bottom: 0.3rem;
+
+    &.is-active {
+      color: var(--color-text);
+      font-weight: 600;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 2px;
+        background: var(--color-accent);
+      }
+    }
+  }
+}
+
+// Language switcher — segmented button group (2 ngôn ngữ), thay cho <ul>
+// bullet-list trần trước đó. Vẫn là <a> thuần (không cần JS để chuyển
+// ngôn ngữ), chỉ đổi cách trình bày thành nhóm nút.
+.lang-switcher {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lang-switcher__btn {
+  padding: 0.3rem 0.7rem;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+
+  & + & {
+    border-left: 1px solid var(--color-border);
+  }
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-surface);
+  }
+
+  &.is-active {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-weight: 600;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dark-mode toggle button (progressive enhancement — assets/js/main.js sets
+// data-theme on <html>; without JS the button just sits there inert, nav
+// and content stay fully usable per CLAUDE.md §4 invariant 1).
+// ---------------------------------------------------------------------------
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  &__icon {
+    width: 1.05rem;
+    height: 1.05rem;
+
+    &--sun {
+      display: none;
+    }
+  }
+}
+
+// Mặc định (chưa bấm toggle lần nào): icon phản ánh theo prefers-color-scheme.
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .theme-toggle__icon--moon { display: none; }
+  :root:not([data-theme]) .theme-toggle__icon--sun { display: block; }
+}
+
+// Đã bấm toggle: icon phản ánh theo lựa chọn thật, bất kể prefers-color-scheme.
+:root[data-theme="dark"] .theme-toggle__icon--moon { display: none; }
+:root[data-theme="dark"] .theme-toggle__icon--sun { display: block; }
+:root[data-theme="light"] .theme-toggle__icon--moon { display: block; }
+:root[data-theme="light"] .theme-toggle__icon--sun { display: none; }
+
+@media (max-width: 30rem) {
+  .site-header .container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-header__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.875rem;
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.25rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .socials {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+
+    a {
+      display: inline-flex;
+      color: var(--color-muted);
+
+      &:hover {
+        color: var(--color-accent);
+      }
+    }
+  }
+
+  .links a {
+    color: var(--color-muted);
+
+    &:hover {
+      color: var(--color-text);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Post list
+// ---------------------------------------------------------------------------
+.post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  a {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  time {
+    display: block;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    margin-top: 0.15rem;
+  }
+
+  // Recent posts (trang chủ) thêm tags + summary dưới title — tag-pill
+  // dùng lại nguyên style từ partials/post/meta.html (đã có spacing đúng).
+  .tags-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.4rem 0 0;
+  }
+
+  &__summary {
+    margin: 0.4rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reading progress bar (blog single — layouts/blog/single.html, JS trong
+// assets/js/main.js cập nhật width theo % đã cuộn qua trang)
+// ---------------------------------------------------------------------------
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  height: 3px;
+  width: 0;
+  background: var(--color-accent);
+  transition: width 0.1s linear;
+}
+
+// ---------------------------------------------------------------------------
+// Article head: breadcrumb / title / meta (date, reading time, tags)
+// ---------------------------------------------------------------------------
+.article-head {
+  padding-top: 0.5rem;
+
+  .title {
+    font-size: 2rem;
+    margin: 0 0 0.9rem;
+  }
+}
+
+.breadcrumb {
+  margin: 0 0 0.9rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+
+  .chevron {
+    color: var(--color-accent);
+    margin-right: 0.3em;
+  }
+
+  a {
+    color: var(--color-muted);
+
+    &:hover {
+      color: var(--color-text);
+    }
+  }
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tags-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.65rem;
+  border-radius: 999px;
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+  font-size: 0.76rem;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: none;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Prev/Next pagination (end of post)
+// ---------------------------------------------------------------------------
+.pagination {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+  margin: 2.5rem 0 0;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--color-border);
+
+  a {
+    display: block;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text);
+
+    &:hover {
+      border-color: var(--color-accent);
+      text-decoration: none;
+    }
+  }
+
+  .dir {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.25rem;
+  }
+
+  .ptitle {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .next {
+    text-align: right;
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 30rem) {
+  .pagination {
+    grid-template-columns: 1fr;
+  }
+
+  .pagination .next {
+    text-align: left;
+    grid-column: 1;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Newsletter signup (UI only — layouts/partials/newsletter-signup-form.html,
+// backend wiring deferred to roadmap Phase 10)
+// ---------------------------------------------------------------------------
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Honeypot field chống bot (layouts/partials/newsletter-signup-form.html)
+// — khác .visually-hidden ở trên: .visually-hidden vẫn để lộ nội dung cho
+// screen reader (đúng mục đích accessibility), còn honeypot cần ẩn khỏi
+// CẢ người dùng thật lẫn assistive tech, nên dùng display:none thẳng.
+.hidden {
+  display: none;
+}
+
+.newsletter {
+  margin: 2.5rem 0 0;
+  padding: 1.4rem 1.5rem;
+  border-radius: 10px;
+  background: var(--color-surface-2);
+
+  h3 {
+    font-size: 1.05rem;
+    margin: 0 0 0.35rem;
+  }
+
+  p {
+    margin: 0 0 1rem;
+    font-size: 0.86rem;
+    color: var(--color-muted);
+  }
+
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  input[type="email"] {
+    flex: 1 1 12rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.88rem;
+    font-family: inherit;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 1px;
+    }
+  }
+
+  button {
+    padding: 0.55rem 1.1rem;
+    border-radius: 6px;
+    border: none;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-weight: 600;
+    font-size: 0.88rem;
+    font-family: inherit;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-accent-strong);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+  }
+
+  .fine {
+    margin: 0.6rem 0 0;
+    font-size: 0.74rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rouge syntax highlighting (source-highlighter=rouge, rouge-css=class in
+// hugo.toml) — github light/dark, generated via:
+//   bundle exec rougify style --scope '.rouge.highlight' github.light
+//   bundle exec rougify style --scope ':root[data-theme="dark"] .rouge.highlight' github.dark
+//   bundle exec rougify style --scope ':root:not([data-theme]) .rouge.highlight' github.dark
+// (the last one wrapped in the prefers-color-scheme query below).
+// Deliberately class-based rather than rouge-css=style (Asciidoctor's
+// inline-style mode): inline mode bakes fixed light-theme hex colors
+// directly onto the <pre>, which cannot respond to dark mode at all —
+// confirmed by inspecting Hugo's build output before choosing this route.
+// ---------------------------------------------------------------------------
+.rouge.highlight table td { padding: 5px; }
+.rouge.highlight table pre { margin: 0; }
+.rouge.highlight, .rouge.highlight .w {
+  color: #24292f;
+  background-color: #f6f8fa;
+}
+.rouge.highlight .k, .rouge.highlight .kd, .rouge.highlight .kn, .rouge.highlight .kp, .rouge.highlight .kr, .rouge.highlight .kt, .rouge.highlight .kv {
+  color: #cf222e;
+}
+.rouge.highlight .gr {
+  color: #f6f8fa;
+}
+.rouge.highlight .gd {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+.rouge.highlight .nb {
+  color: #953800;
+}
+.rouge.highlight .nc {
+  color: #953800;
+}
+.rouge.highlight .no {
+  color: #953800;
+}
+.rouge.highlight .nn {
+  color: #953800;
+}
+.rouge.highlight .sr {
+  color: #116329;
+}
+.rouge.highlight .na {
+  color: #116329;
+}
+.rouge.highlight .nt {
+  color: #116329;
+}
+.rouge.highlight .gi {
+  color: #116329;
+  background-color: #dafbe1;
+}
+.rouge.highlight .ges {
+  font-weight: bold;
+  font-style: italic;
+}
+.rouge.highlight .kc {
+  color: #0550ae;
+}
+.rouge.highlight .l, .rouge.highlight .ld, .rouge.highlight .m, .rouge.highlight .mb, .rouge.highlight .mf, .rouge.highlight .mh, .rouge.highlight .mi, .rouge.highlight .il, .rouge.highlight .mo, .rouge.highlight .mx {
+  color: #0550ae;
+}
+.rouge.highlight .sb {
+  color: #0550ae;
+}
+.rouge.highlight .bp {
+  color: #0550ae;
+}
+.rouge.highlight .ne {
+  color: #0550ae;
+}
+.rouge.highlight .nl {
+  color: #0550ae;
+}
+.rouge.highlight .py {
+  color: #0550ae;
+}
+.rouge.highlight .nv, .rouge.highlight .vc, .rouge.highlight .vg, .rouge.highlight .vi, .rouge.highlight .vm {
+  color: #0550ae;
+}
+.rouge.highlight .o, .rouge.highlight .ow {
+  color: #0550ae;
+}
+.rouge.highlight .gh {
+  color: #0550ae;
+  font-weight: bold;
+}
+.rouge.highlight .gu {
+  color: #0550ae;
+  font-weight: bold;
+}
+.rouge.highlight .s, .rouge.highlight .sa, .rouge.highlight .sc, .rouge.highlight .dl, .rouge.highlight .sd, .rouge.highlight .s2, .rouge.highlight .se, .rouge.highlight .sh, .rouge.highlight .sx, .rouge.highlight .s1, .rouge.highlight .ss {
+  color: #0a3069;
+}
+.rouge.highlight .nd {
+  color: #8250df;
+}
+.rouge.highlight .nf, .rouge.highlight .fm {
+  color: #8250df;
+}
+.rouge.highlight .err {
+  color: #f6f8fa;
+  background-color: #82071e;
+}
+.rouge.highlight .c, .rouge.highlight .ch, .rouge.highlight .cd, .rouge.highlight .cm, .rouge.highlight .cp, .rouge.highlight .cpf, .rouge.highlight .c1, .rouge.highlight .cs {
+  color: #6e7781;
+}
+.rouge.highlight .gl {
+  color: #6e7781;
+}
+.rouge.highlight .gt {
+  color: #6e7781;
+}
+.rouge.highlight .ni {
+  color: #24292f;
+}
+.rouge.highlight .si {
+  color: #24292f;
+}
+.rouge.highlight .ge {
+  color: #24292f;
+  font-style: italic;
+}
+.rouge.highlight .gs {
+  color: #24292f;
+  font-weight: bold;
+}
+
+:root[data-theme="dark"] .rouge.highlight table td { padding: 5px; }
+:root[data-theme="dark"] .rouge.highlight table pre { margin: 0; }
+:root[data-theme="dark"] .rouge.highlight, :root[data-theme="dark"] .rouge.highlight .w {
+  color: #c9d1d9;
+  background-color: #161b22;
+}
+:root[data-theme="dark"] .rouge.highlight .k, :root[data-theme="dark"] .rouge.highlight .kd, :root[data-theme="dark"] .rouge.highlight .kn, :root[data-theme="dark"] .rouge.highlight .kp, :root[data-theme="dark"] .rouge.highlight .kr, :root[data-theme="dark"] .rouge.highlight .kt, :root[data-theme="dark"] .rouge.highlight .kv {
+  color: #ff7b72;
+}
+:root[data-theme="dark"] .rouge.highlight .gr {
+  color: #f0f6fc;
+}
+:root[data-theme="dark"] .rouge.highlight .gd {
+  color: #ffdcd7;
+  background-color: #67060c;
+}
+:root[data-theme="dark"] .rouge.highlight .nb {
+  color: #ffa657;
+}
+:root[data-theme="dark"] .rouge.highlight .nc {
+  color: #ffa657;
+}
+:root[data-theme="dark"] .rouge.highlight .no {
+  color: #ffa657;
+}
+:root[data-theme="dark"] .rouge.highlight .nn {
+  color: #ffa657;
+}
+:root[data-theme="dark"] .rouge.highlight .sr {
+  color: #7ee787;
+}
+:root[data-theme="dark"] .rouge.highlight .na {
+  color: #7ee787;
+}
+:root[data-theme="dark"] .rouge.highlight .nt {
+  color: #7ee787;
+}
+:root[data-theme="dark"] .rouge.highlight .gi {
+  color: #aff5b4;
+  background-color: #033a16;
+}
+:root[data-theme="dark"] .rouge.highlight .ges {
+  font-weight: bold;
+  font-style: italic;
+}
+:root[data-theme="dark"] .rouge.highlight .kc {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .l, :root[data-theme="dark"] .rouge.highlight .ld, :root[data-theme="dark"] .rouge.highlight .m, :root[data-theme="dark"] .rouge.highlight .mb, :root[data-theme="dark"] .rouge.highlight .mf, :root[data-theme="dark"] .rouge.highlight .mh, :root[data-theme="dark"] .rouge.highlight .mi, :root[data-theme="dark"] .rouge.highlight .il, :root[data-theme="dark"] .rouge.highlight .mo, :root[data-theme="dark"] .rouge.highlight .mx {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .sb {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .bp {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .ne {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .nl {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .py {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .nv, :root[data-theme="dark"] .rouge.highlight .vc, :root[data-theme="dark"] .rouge.highlight .vg, :root[data-theme="dark"] .rouge.highlight .vi, :root[data-theme="dark"] .rouge.highlight .vm {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .o, :root[data-theme="dark"] .rouge.highlight .ow {
+  color: #79c0ff;
+}
+:root[data-theme="dark"] .rouge.highlight .gh {
+  color: #1f6feb;
+  font-weight: bold;
+}
+:root[data-theme="dark"] .rouge.highlight .gu {
+  color: #1f6feb;
+  font-weight: bold;
+}
+:root[data-theme="dark"] .rouge.highlight .s, :root[data-theme="dark"] .rouge.highlight .sa, :root[data-theme="dark"] .rouge.highlight .sc, :root[data-theme="dark"] .rouge.highlight .dl, :root[data-theme="dark"] .rouge.highlight .sd, :root[data-theme="dark"] .rouge.highlight .s2, :root[data-theme="dark"] .rouge.highlight .se, :root[data-theme="dark"] .rouge.highlight .sh, :root[data-theme="dark"] .rouge.highlight .sx, :root[data-theme="dark"] .rouge.highlight .s1, :root[data-theme="dark"] .rouge.highlight .ss {
+  color: #a5d6ff;
+}
+:root[data-theme="dark"] .rouge.highlight .nd {
+  color: #d2a8ff;
+}
+:root[data-theme="dark"] .rouge.highlight .nf, :root[data-theme="dark"] .rouge.highlight .fm {
+  color: #d2a8ff;
+}
+:root[data-theme="dark"] .rouge.highlight .err {
+  color: #f0f6fc;
+  background-color: #8e1519;
+}
+:root[data-theme="dark"] .rouge.highlight .c, :root[data-theme="dark"] .rouge.highlight .ch, :root[data-theme="dark"] .rouge.highlight .cd, :root[data-theme="dark"] .rouge.highlight .cm, :root[data-theme="dark"] .rouge.highlight .cp, :root[data-theme="dark"] .rouge.highlight .cpf, :root[data-theme="dark"] .rouge.highlight .c1, :root[data-theme="dark"] .rouge.highlight .cs {
+  color: #8b949e;
+}
+:root[data-theme="dark"] .rouge.highlight .gl {
+  color: #8b949e;
+}
+:root[data-theme="dark"] .rouge.highlight .gt {
+  color: #8b949e;
+}
+:root[data-theme="dark"] .rouge.highlight .ni {
+  color: #c9d1d9;
+}
+:root[data-theme="dark"] .rouge.highlight .si {
+  color: #c9d1d9;
+}
+:root[data-theme="dark"] .rouge.highlight .ge {
+  color: #c9d1d9;
+  font-style: italic;
+}
+:root[data-theme="dark"] .rouge.highlight .gs {
+  color: #c9d1d9;
+  font-weight: bold;
+}
+
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme]) .rouge.highlight table td { padding: 5px; }
+:root:not([data-theme]) .rouge.highlight table pre { margin: 0; }
+:root:not([data-theme]) .rouge.highlight, :root:not([data-theme]) .rouge.highlight .w {
+  color: #c9d1d9;
+  background-color: #161b22;
+}
+:root:not([data-theme]) .rouge.highlight .k, :root:not([data-theme]) .rouge.highlight .kd, :root:not([data-theme]) .rouge.highlight .kn, :root:not([data-theme]) .rouge.highlight .kp, :root:not([data-theme]) .rouge.highlight .kr, :root:not([data-theme]) .rouge.highlight .kt, :root:not([data-theme]) .rouge.highlight .kv {
+  color: #ff7b72;
+}
+:root:not([data-theme]) .rouge.highlight .gr {
+  color: #f0f6fc;
+}
+:root:not([data-theme]) .rouge.highlight .gd {
+  color: #ffdcd7;
+  background-color: #67060c;
+}
+:root:not([data-theme]) .rouge.highlight .nb {
+  color: #ffa657;
+}
+:root:not([data-theme]) .rouge.highlight .nc {
+  color: #ffa657;
+}
+:root:not([data-theme]) .rouge.highlight .no {
+  color: #ffa657;
+}
+:root:not([data-theme]) .rouge.highlight .nn {
+  color: #ffa657;
+}
+:root:not([data-theme]) .rouge.highlight .sr {
+  color: #7ee787;
+}
+:root:not([data-theme]) .rouge.highlight .na {
+  color: #7ee787;
+}
+:root:not([data-theme]) .rouge.highlight .nt {
+  color: #7ee787;
+}
+:root:not([data-theme]) .rouge.highlight .gi {
+  color: #aff5b4;
+  background-color: #033a16;
+}
+:root:not([data-theme]) .rouge.highlight .ges {
+  font-weight: bold;
+  font-style: italic;
+}
+:root:not([data-theme]) .rouge.highlight .kc {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .l, :root:not([data-theme]) .rouge.highlight .ld, :root:not([data-theme]) .rouge.highlight .m, :root:not([data-theme]) .rouge.highlight .mb, :root:not([data-theme]) .rouge.highlight .mf, :root:not([data-theme]) .rouge.highlight .mh, :root:not([data-theme]) .rouge.highlight .mi, :root:not([data-theme]) .rouge.highlight .il, :root:not([data-theme]) .rouge.highlight .mo, :root:not([data-theme]) .rouge.highlight .mx {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .sb {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .bp {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .ne {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .nl {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .py {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .nv, :root:not([data-theme]) .rouge.highlight .vc, :root:not([data-theme]) .rouge.highlight .vg, :root:not([data-theme]) .rouge.highlight .vi, :root:not([data-theme]) .rouge.highlight .vm {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .o, :root:not([data-theme]) .rouge.highlight .ow {
+  color: #79c0ff;
+}
+:root:not([data-theme]) .rouge.highlight .gh {
+  color: #1f6feb;
+  font-weight: bold;
+}
+:root:not([data-theme]) .rouge.highlight .gu {
+  color: #1f6feb;
+  font-weight: bold;
+}
+:root:not([data-theme]) .rouge.highlight .s, :root:not([data-theme]) .rouge.highlight .sa, :root:not([data-theme]) .rouge.highlight .sc, :root:not([data-theme]) .rouge.highlight .dl, :root:not([data-theme]) .rouge.highlight .sd, :root:not([data-theme]) .rouge.highlight .s2, :root:not([data-theme]) .rouge.highlight .se, :root:not([data-theme]) .rouge.highlight .sh, :root:not([data-theme]) .rouge.highlight .sx, :root:not([data-theme]) .rouge.highlight .s1, :root:not([data-theme]) .rouge.highlight .ss {
+  color: #a5d6ff;
+}
+:root:not([data-theme]) .rouge.highlight .nd {
+  color: #d2a8ff;
+}
+:root:not([data-theme]) .rouge.highlight .nf, :root:not([data-theme]) .rouge.highlight .fm {
+  color: #d2a8ff;
+}
+:root:not([data-theme]) .rouge.highlight .err {
+  color: #f0f6fc;
+  background-color: #8e1519;
+}
+:root:not([data-theme]) .rouge.highlight .c, :root:not([data-theme]) .rouge.highlight .ch, :root:not([data-theme]) .rouge.highlight .cd, :root:not([data-theme]) .rouge.highlight .cm, :root:not([data-theme]) .rouge.highlight .cp, :root:not([data-theme]) .rouge.highlight .cpf, :root:not([data-theme]) .rouge.highlight .c1, :root:not([data-theme]) .rouge.highlight .cs {
+  color: #8b949e;
+}
+:root:not([data-theme]) .rouge.highlight .gl {
+  color: #8b949e;
+}
+:root:not([data-theme]) .rouge.highlight .gt {
+  color: #8b949e;
+}
+:root:not([data-theme]) .rouge.highlight .ni {
+  color: #c9d1d9;
+}
+:root:not([data-theme]) .rouge.highlight .si {
+  color: #c9d1d9;
+}
+:root:not([data-theme]) .rouge.highlight .ge {
+  color: #c9d1d9;
+  font-style: italic;
+}
+:root:not([data-theme]) .rouge.highlight .gs {
+  color: #c9d1d9;
+  font-weight: bold;
+}
+}
+
+// ---------------------------------------------------------------------------
+// AsciiDoc content rendering
+// ---------------------------------------------------------------------------
+.content {
+  h2,
+  h3,
+  h4 {
+    line-height: 1.3;
+  }
+
+  .anchor {
+    text-decoration: none;
+    margin-left: -1.1em;
+    padding-right: 0.3em;
+    color: var(--color-muted);
+    visibility: hidden;
+  }
+
+  h2:hover .anchor,
+  h3:hover .anchor,
+  h4:hover .anchor {
+    visibility: visible;
+  }
+
+  pre,
+  code {
+    font-family: var(--font-mono);
+  }
+
+  // Inline code only — `.rouge.highlight pre code` (block code) is excluded
+  // and left to the Rouge stylesheet below.
+  code:not(pre code) {
+    background: var(--color-surface);
+    border-radius: 4px;
+    padding: 0.12em 0.4em;
+    font-size: 0.88em;
+  }
+
+  // Fenced/source code blocks ([source,xxx]----...----). Rouge (rouge-css:
+  // class, see hugo.toml) owns the syntax-token colors and the pre's own
+  // background/text color via the .rouge.highlight rules further below —
+  // deliberately NOT overridden here, since the github light/dark themes
+  // were tuned as a pair against their own background. This block only
+  // adds the surrounding card treatment.
+  .listingblock {
+    margin: 1.3rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+
+    pre {
+      margin: 0;
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    // When callouts follow (see .colist below), fuse the two boxes into one.
+    &:has(+ .colist) {
+      margin-bottom: 0;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  // Callout marker inside a Rouge code block, e.g. `// <1>` -> `<b class="conum">(1)</b>`.
+  .conum {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4em;
+    padding: 0 0.35em;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.78em;
+    line-height: 1.5;
+  }
+
+  // Callout explanation list right after a .listingblock with callouts.
+  .colist {
+    margin: 0 0 1.3rem;
+    padding: 0.75rem 1.1rem;
+    border: 1px solid var(--color-border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background: var(--color-bg);
+    font-size: 0.86rem;
+    color: var(--color-muted);
+
+    ol {
+      margin: 0;
+      padding-left: 1.2em;
+    }
+
+    li + li {
+      margin-top: 0.3rem;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  // Plain indented/literal blocks (no syntax highlighting) still get a box.
+  .literalblock pre {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0;
+
+    th,
+    td {
+      border: 1px solid var(--color-border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+  }
+
+  // NOTE/WARNING/TIP. Asciidoctor's markup is a 2-cell <table> (icon cell +
+  // content cell); `display: contents` on table/tr unwraps them so the
+  // cells become flex children of .admonitionblock directly, without
+  // touching the generated HTML.
+  .admonitionblock {
+    --_c: var(--color-note);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    margin: 1.3rem 0;
+    padding: 0.9rem 1.1rem;
+    border-left: 4px solid var(--_c);
+    border-radius: 6px;
+    background: var(--color-surface);
+
+    &.warning {
+      --_c: var(--color-warning);
+    }
+
+    &.tip {
+      --_c: var(--color-tip);
+    }
+
+    table {
+      display: contents;
+    }
+
+    tr {
+      display: contents;
+    }
+
+    td {
+      border: none;
+      padding: 0;
+    }
+
+    td.content {
+      flex: 1;
+      font-size: 0.92rem;
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    // The "Note"/"Warning"/"Tip" text Asciidoctor renders — kept for
+    // accessibility, restyled as a small uppercase label with a CSS-only
+    // icon glyph (no Font Awesome / icon-font dependency).
+    .title {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.3rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.72rem;
+      color: var(--_c);
+
+      &::before {
+        content: "i";
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 50%;
+        background: var(--_c);
+        color: var(--color-on-accent);
+        font-size: 0.68rem;
+        font-style: normal;
+      }
+    }
+
+    &.warning .title::before {
+      content: "!";
+    }
+
+    &.tip .title::before {
+      content: "\2713"; // ✓
+    }
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Homepage — hero, search box, featured project banner, projects grid,
+// recent posts header (layouts/index.html, partials/featured-project.html)
+// ---------------------------------------------------------------------------
+// Hero — CSS Grid 2 cột bám đúng vị trí reference: text (tagline/headline/
+// bio) chiếm cột trái xếp dọc, portrait ghim cột phải cao bằng cả khối text.
+// DOM order vẫn tagline->headline->portrait->bio (đọc được nếu CSS tắt),
+// grid-area xếp lại vị trí hiển thị. Đổi bố cục khác hẳn ở mobile — portrait
+// nhỏ nằm góc trái cạnh tagline/headline, bio wrap bên cạnh.
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "tagline  portrait"
+    "headline portrait"
+    "bio      portrait";
+  column-gap: 3rem;
+  align-items: center;
+  margin: 1.25rem 0 2.5rem;
+}
+
+.hero__tagline {
+  grid-area: tagline;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+.hero__headline {
+  grid-area: headline;
+  margin: 0.75rem 0 0;
+  font-size: 2rem;
+
+  em {
+    font-style: italic;
+    color: var(--color-accent-strong);
+  }
+}
+
+// Portrait — khung bo góc vuông (không phải hình tròn) + viền dạng 3 lớp
+// ring lồng nhau qua box-shadow (hairline mảnh -> khoảng đệm màu nền ->
+// vòng nhấn màu accent), dùng token màu của dự án, không copy giá trị màu
+// từ reference.
+.hero__portrait {
+  grid-area: portrait;
+  width: 240px;
+  height: 240px;
+  object-fit: cover;
+  object-position: 50% 30%;
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    0 0 0 6px var(--color-bg),
+    0 0 0 7px var(--color-accent),
+    0 24px 40px -24px rgba(0, 0, 0, 0.45);
+}
+
+.hero__bio {
+  grid-area: bio;
+  margin-top: 1rem;
+  color: var(--color-muted);
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: var(--color-accent);
+  }
+}
+
+@media (max-width: 45rem) {
+  .hero {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "tagline  tagline"
+      "headline headline"
+      "portrait bio";
+    column-gap: 1.1rem;
+    align-items: start;
+  }
+
+  .hero__bio {
+    margin-top: 1.2rem;
+  }
+
+  .hero__portrait {
+    width: 96px;
+    height: 96px;
+    border-radius: 16px;
+    margin-top: 0.3rem;
+    box-shadow:
+      0 0 0 1px var(--color-border),
+      0 0 0 3px var(--color-bg),
+      0 0 0 4px var(--color-accent),
+      0 12px 24px -16px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// Search box — ô luôn hiển thị (không còn <details> ẩn/hiện), assets/js/main.js
+// gọi Pagefind low-level API và thế kết quả vào #search-results/#post-list
+// bên dưới (.recent-posts). Không cần JS để hiển thị input, chỉ cần JS để
+// input phản hồi (progressive enhancement, CLAUDE.md §4 invariant #1).
+.search-box {
+  margin: 0 0 2.5rem;
+}
+
+.search-box__field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+
+  &:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    color: var(--color-muted);
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    background: none;
+    color: var(--color-text);
+    font: inherit;
+    outline: none;
+
+    &::placeholder {
+      color: var(--color-muted);
+    }
+  }
+}
+
+.search-box__hint {
+  margin: 0.5rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+
+  b {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+}
+
+.search-no-results {
+  color: var(--color-muted);
+  padding: 0.9rem 0;
+}
+
+// Lúc đang search (body.searching, gán ở assets/js/main.js): ẩn banner
+// featured-project để kết quả nằm sát ngay dưới ô search — cùng ý tưởng
+// reference collapse .feature/.books-strip lúc searching.
+body.searching {
+  .featured-project {
+    display: none;
+  }
+}
+
+// Featured project banner
+.featured-project {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 0 0 2.5rem;
+  padding: 1.5rem;
+  border-radius: 10px;
+  background: var(--color-surface-2);
+
+  &__image {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  &__body h2 {
+    margin: 0 0 0.5rem;
+  }
+
+  &__body p {
+    margin: 0 0 1rem;
+    color: var(--color-muted);
+  }
+
+  &__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+}
+
+@media (min-width: 30rem) {
+  .featured-project {
+    flex-direction: row;
+    align-items: center;
+
+    &__image {
+      width: 40%;
+    }
+  }
+}
+
+// Button — dùng chung cho featured-project CTA (ngôn ngữ giống .newsletter button)
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.88rem;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  &--primary {
+    border: none;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+
+    &:hover {
+      background: var(--color-accent-strong);
+    }
+  }
+
+  &--secondary {
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+
+    &:hover {
+      border-color: var(--color-accent);
+    }
+  }
+}
+
+// Projects grid (/projects/ — layouts/_default/list.html, nhánh "page")
+// Card ngang: ảnh trái/chữ phải, xếp thành danh sách dọc (không phải lưới
+// nhiều cột) — mọi card cùng chiều cao (height cố định trên .projects-grid__card a,
+// ảnh height:100% + object-fit:cover ăn theo) và cùng chiều rộng (100% container).
+.projects-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+
+  &__card a {
+    display: flex;
+    align-items: stretch;
+    height: 8rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text);
+
+    &:hover {
+      border-color: var(--color-accent);
+      text-decoration: none;
+    }
+  }
+
+  &__cover {
+    display: block;
+    width: 10rem;
+    height: 100%;
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+
+  &__body {
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    overflow: hidden;
+  }
+
+  &__icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-bottom: 0.4rem;
+  }
+
+  &__title {
+    display: block;
+    font-weight: 600;
+  }
+
+  &__subtitle {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin-top: 0.2rem;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+}
+
+// Màn hẹp: ảnh nhỏ lại để nhường chỗ chữ, card vẫn giữ dạng ngang (không
+// chuyển về dọc) — tránh chữ bị bóp quá chật ở điện thoại.
+@media (max-width: 26rem) {
+  .projects-grid__cover {
+    width: 6rem;
+  }
+}
+
+// Project single page (layouts/projects/single.html)
+.project-subtitle {
+  margin: -0.5rem 0 1.25rem;
+  color: var(--color-muted);
+  font-size: 1.05rem;
+}
+
+.project-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 0 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+// Recent posts header + archive link
+.recent-posts__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.recent-posts__count {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.archive-link {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+}

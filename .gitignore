@@ -1,0 +1,14 @@
+_reference/
+CLAUDE.md
+full-feature-roadmap.md
+
+# Hugo build output — Netlify builds this, never commit it (CLAUDE.md §4 invariant 8)
+public/
+resources/
+.hugo_build.lock
+
+# OS / editor cruft
+.DS_Store
+
+# Node deps cho PostCSS pipeline — Netlify tự npm install lại từ package.json
+node_modules/

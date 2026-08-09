@@ -1,0 +1,157 @@
+baseURL = "https://hoangluongtran.dev/"
+googleAnalytics = "G-XXXXXXXXXX" # TODO: điền Measurement ID thật sau khi tạo GA4 property (Phase 8)
+
+mainSections = ["blog"]
+
+# vi phục vụ ở "/" (defaultContentLanguage, không có subdir); en ở "/en/".
+# Dùng `label` chứ không phải `languageName` — key cũ đã deprecated từ Hugo
+# 0.158.0 và warning mỗi build (bản pin hiện tại: 0.164.0, xem netlify.toml).
+# Template vẫn đọc tên hiển thị qua `.LanguageName` như trước, không đổi gì
+# phía template. Menu chuyển vào đây (per-language) vì Hugo không tự dịch
+# `.Name` của 1 menu toàn cục — xem CLAUDE.md §3 (convention file-suffix
+# i18n) để biết lý do chọn cách tổ chức content tương ứng.
+defaultContentLanguage = "vi"
+defaultContentLanguageInSubdir = false
+
+[languages.vi]
+  label = "Tiếng Việt"
+  title = "Hoàng Lương Trần"
+  copyright = "© 2026 Hoàng Lương Trần"
+  weight = 1
+  [[languages.vi.menu.main]]
+    name = "Blog"
+    url = "/"
+    weight = 1
+  [[languages.vi.menu.main]]
+    name = "Dự án"
+    url = "/projects"
+    weight = 2
+  [[languages.vi.menu.main]]
+    name = "Giới thiệu"
+    url = "/about"
+    weight = 3
+
+[languages.en]
+  label = "English"
+  title = "Hoang Luong Tran"
+  copyright = "© 2026 Hoang Luong Tran"
+  weight = 2
+  [[languages.en.menu.main]]
+    name = "Blog"
+    url = "/"
+    weight = 1
+  [[languages.en.menu.main]]
+    name = "Projects"
+    url = "/projects"
+    weight = 2
+  [[languages.en.menu.main]]
+    name = "About"
+    url = "/about"
+    weight = 3
+  # Override từng field cần dịch — đã verify Hugo deep-merge
+  # [languages.en.params] lên trên [params] toàn cục theo field, không
+  # phải thay thế cả bảng, nên chỉ cần khai field khác bản VI (title,
+  # image, ctaSecondary "GitHub" giữ nguyên từ [params] toàn cục — tên
+  # riêng/thương hiệu, không dịch).
+  [languages.en.params]
+    heroHeadline = "I build _developer tools_ that help ship software faster"
+    heroImageAlt = "Portrait photo of Hoang Luong Tran"
+    [languages.en.params.featuredProject]
+      title = "Sample Project"
+      description = "Dummy data (not a real product) used to check the featured-project banner UI on the homepage."
+      [languages.en.params.featuredProject.ctaPrimary]
+        label = "View demo"
+
+[params]
+  images = ["images/og-fallback.png"] # fallback OG/Twitter image khi trang không có ảnh riêng
+  favicon = "favicon.svg"
+
+  # Tagline nhỏ trên hero (layouts/index.html) — 3-4 công nghệ chủ đạo, nối
+  # bằng " · ". TODO: chỉnh lại danh sách thật.
+  techStack = ["Java", "Spring Boot", "Kotlin", "Hugo"]
+
+  # Headline lớn ở hero. Cú pháp markdown _..._ hoặc *...* để in nghiêng 1
+  # cụm nhấn mạnh — render qua `| markdownify`, KHÔNG dùng cú pháp AsciiDoc.
+  # TODO: viết lại headline thật.
+  heroHeadline = "Mình xây _developer tools_ giúp việc release phần mềm nhanh hơn"
+
+  # Ảnh chân dung hero — path tính từ /static (giống cách params.favicon
+  # trỏ), KHÔNG dùng chung params.images (field đó là OG fallback, mục đích
+  # khác). TODO: thêm file ảnh thật vào static/images/avatar.jpg.
+  heroImage = "images/avatar.jpg"
+  heroImageAlt = "Ảnh chân dung Hoàng Lương Trần"
+
+  # Social icons ở footer (layouts/partials/footer.html) — để trống thì icon
+  # tương ứng không render (partial chỉ `with` khi có giá trị).
+  [params.social]
+    github = "https://github.com/hoangluongtran0309"
+    linkedin = "https://linkedin.com/in/hoangluongtran0309/"
+    x = "https://x.com/luongtran0309"
+
+  # Banner sản phẩm nổi bật (layouts/partials/featured-project.html) — xoá
+  # cả bảng [params.featuredProject] thì section này ẩn hoàn toàn. Dữ liệu
+  # dưới đây chỉ là mẫu (placeholder image assets/images/featured/placeholder.png)
+  # để test giao diện banner — TODO: thay bằng project thật khi có.
+  [params.featuredProject]
+    title = "Sample Project"
+    description = "Dữ liệu mẫu (không phải sản phẩm thật) dùng để kiểm tra giao diện banner sản phẩm nổi bật ở trang chủ."
+    image = "images/featured/placeholder.png"
+    [params.featuredProject.ctaPrimary]
+      label = "Xem demo"
+      url = "#"
+    [params.featuredProject.ctaSecondary]
+      label = "GitHub"
+      url = "#"
+
+[taxonomies]
+  tag = "tags"
+
+# RSS chỉ bật cho section blog (content/blog/_index.*.adoc override qua
+# front matter `outputs`) — tắt mặc định ở home/section/taxonomy/term để
+# tránh feed trộn lẫn project pages + trang newsletter/thanks không có
+# date. Xem layouts/blog/rss.xml.
+[services.rss]
+  limit = 20
+
+[outputs]
+  home = ["HTML"]
+  section = ["HTML"]
+  taxonomy = ["HTML"]
+  term = ["HTML"]
+
+[privacy.googleAnalytics]
+  anonymizeIP = true
+  respectDoNotTrack = true
+  useSessionStorage = true
+
+[security]
+  enableInlineShortcodes = false
+
+[security.exec]
+  allow = ['^dart-sass-embedded$', '^go$', '^npx$', '^postcss$', '^node$', 'asciidoctor']
+  osEnv = ['(?i)^(PATH|PATHEXT|APPDATA|TMP|TEMP|TERM|GEM_PATH)$']
+
+[security.funcs]
+  getenv = ['^HUGO_']
+
+[security.http]
+  methods = ['(?i)GET|POST']
+  urls = ['.*']
+
+[markup]
+  [markup.asciidocExt]
+    extensions = []
+    workingFolderCurrent = true
+    trace = false
+    failureLevel = "fatal"
+
+    [markup.asciidocExt.attributes]
+      sectanchors = ""
+      "source-highlighter" = "rouge"
+      # class (not style): inline-style mode bakes fixed light-theme hex colors
+      # directly onto <pre>, which can't respond to dark mode. Class mode emits
+      # stable token classes (.k, .s, .nc, ...) and the actual colors — github
+      # light + github dark, generated via `bundle exec rougify style` — live in
+      # assets/scss/main.scss (see "Rouge syntax highlighting" section there).
+      # rouge-style is intentionally unset: it only affects inline-style mode.
+      "rouge-css" = "class"

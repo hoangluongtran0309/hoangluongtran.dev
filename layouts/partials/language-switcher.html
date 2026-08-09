@@ -1,0 +1,34 @@
+{{/*
+  Language switcher — luôn hiển thị mọi ngôn ngữ (duyệt qua hugo.Sites),
+  kể cả khi trang hiện tại chưa có bản dịch. .AllTranslations bao gồm cả
+  chính trang hiện tại (self-reference), nên $translated map đủ để biết
+  ngôn ngữ nào đã có bản dịch thật.
+
+  Dùng `hugo.Sites` (không phải .Site.Languages/.Site.Sites) và
+  `.Language.Label` (không phải .LanguageName) — cả 3 API cũ đều
+  deprecated từ Hugo 0.156-0.158, bản pin hiện tại (0.164.0, xem
+  netlify.toml) warning ngay khi build nếu dùng key cũ.
+
+  Nếu chưa có bản dịch: fallback về trang chủ của ngôn ngữ đó (không
+  404), kèm title tooltip báo "chưa có bản dịch" — quyết định UX đã chốt
+  với user (ưu tiên switcher ổn định ở mọi trang + giúp độc giả biết site
+  có bản ngôn ngữ khác, thay vì ẩn hẳn entry).
+*/}}
+{{ $translated := dict }}
+{{ range .AllTranslations }}
+  {{ $translated = merge $translated (dict .Language.Lang .RelPermalink) }}
+{{ end }}
+<div class="lang-switcher" role="group" aria-label="{{ i18n "languageSwitcherLabel" }}">
+  {{ range hugo.Sites }}
+    {{ $lang := .Language.Lang }}
+    {{ $hasTranslation := isset $translated $lang }}
+    {{ $url := index $translated $lang }}
+    {{ if not $hasTranslation }}{{ $url = .Home.RelPermalink }}{{ end }}
+    <a href="{{ $url }}"
+       class="lang-switcher__btn {{ if eq $lang $.Site.Language.Lang }}is-active{{ end }}"
+       {{ if eq $lang $.Site.Language.Lang }}aria-current="true"{{ end }}
+       {{ if not $hasTranslation }}title="{{ i18n "noTranslationYet" }}"{{ end }}>
+      {{ .Language.Label }}
+    </a>
+  {{ end }}
+</div>

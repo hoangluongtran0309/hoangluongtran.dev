@@ -1,0 +1,58 @@
+---
+title: "Sample post 1"
+date: 2026-08-01T09:00:00+07:00
+tags: ["sample", "test-ui"]
+summary: "Dummy content (not a real post) used to check the UI: admonitions, a table, a code block with a callout, a page-bundle image, and an internal cross-reference."
+draft: false
+---
+
+= Sample post 1
+
+This is a *sample* post (dummy content, not real) — used only to check how
+AsciiDoc elements render: admonitions, a table, a code block with a callout,
+an image, and an internal cross-reference. See the
+<<conclusion,conclusion>> at the end for more.
+
+image::diagram.png["Sample image — placeholder"]
+
+== Sample code block
+
+[source,java]
+----
+public record SamplePost(String slug, String title, List<String> tags) {
+
+    public boolean hasTag(String tag) {
+        return tags.contains(tag); // <1>
+    }
+}
+----
+<1> Sample callout note.
+
+Sample inline code: `hugo && npx pagefind --site public`.
+
+== Sample admonitions
+
+NOTE: This is a sample NOTE admonition, used to check its display style.
+
+WARNING: This is a sample WARNING admonition.
+
+TIP: This is a sample TIP admonition.
+
+== Sample table
+
+[cols="1,2"]
+|===
+| Column 1 | Column 2
+
+| Row 1
+| Sample data
+
+| Row 2
+| Sample data
+|===
+
+[[conclusion]]
+== Conclusion
+
+All of the above exists purely to check the UI — it doesn't represent any
+real post.

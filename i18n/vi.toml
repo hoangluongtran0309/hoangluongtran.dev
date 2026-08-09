@@ -1,0 +1,108 @@
+# Chuỗi UI cố định cho ngôn ngữ Tiếng Việt (vi = defaultContentLanguage).
+# Song song với i18n/en.toml — mỗi key ở đây PHẢI có key tương ứng bên đó.
+# Xem CLAUDE.md §4 invariant #9 (mọi string UI phải qua i18n/*.toml).
+# Wire vào template ở Bước 3b (commit riêng) — file này chỉ là data, chưa
+# có call site nào dùng tới.
+
+[themeToggleLabelDark]
+other = "Chuyển sang giao diện tối"
+
+[themeToggleLabelLight]
+other = "Chuyển sang giao diện sáng"
+
+[themeToggleLabelDefault]
+other = "Chuyển giao diện sáng/tối"
+
+[tags]
+other = "Thẻ"
+
+[readingTime]
+other = "phút đọc"
+
+[draft]
+other = "BẢN NHÁP"
+
+[breadcrumbBlog]
+other = "blog"
+
+[searchPlaceholder]
+other = "Tìm kiếm bài viết…"
+
+[searchHint]
+other = "Gõ để tìm kiếm — thử"
+
+[searchResultsHeading]
+other = "Kết quả tìm kiếm"
+
+# Token {query} do assets/js/main.js thay bằng từ khoá thực tế lúc chạy —
+# không phải Hugo template var, giữ nguyên literal khi dịch.
+[searchResultsFor]
+other = "Kết quả cho “{query}”"
+
+[searchNoResultsFor]
+other = "Không có kết quả nào cho “{query}”"
+
+[recentPostsHeading]
+other = "Bài viết gần đây"
+
+[blogArchiveHeading]
+other = "Tất cả bài viết"
+
+[articleCount]
+other = "{{ .Count }} bài viết"
+
+[showingXofY]
+other = "hiển thị {{ .Count }} / {{ .Total }}"
+
+[browseArchive]
+other = "Xem toàn bộ lưu trữ →"
+
+[previousArticle]
+other = "← Bài trước"
+
+[nextArticle]
+other = "Bài sau →"
+
+[tagPageTitle]
+other = "Thẻ: {{ .Tag }}"
+
+[notFoundTitle]
+other = "404 — Không tìm thấy trang"
+
+[notFoundHome]
+other = "Về trang chủ"
+
+[paginatorNewer]
+other = "← Mới hơn"
+
+[paginatorOlder]
+other = "Cũ hơn →"
+
+[newsletterHeading]
+other = "Nhận bài viết mới qua email"
+
+[newsletterBody]
+other = "Mỗi khi có bài viết mới về Spring Boot, kiến trúc hệ thống hay ghi chép kỹ thuật, mình sẽ gửi thẳng vào hộp thư của bạn."
+
+[newsletterEmailLabel]
+other = "Địa chỉ email"
+
+[newsletterEmailPlaceholder]
+other = "ban@example.com"
+
+[newsletterSubmit]
+other = "Đăng ký"
+
+[newsletterFinePrint]
+other = "Không gửi spam, không chia sẻ email cho bên thứ ba. Huỷ đăng ký bất cứ lúc nào."
+
+# Label của honeypot field chống bot — không hiển thị với người dùng thật
+# (ẩn qua CSS .hidden), vẫn qua i18n theo invariant #9.
+[newsletterHoneypotLabel]
+other = "Nếu bạn là người, hãy để trống trường này"
+
+[noTranslationYet]
+other = "Chưa có bản dịch bài này"
+
+[languageSwitcherLabel]
+other = "Chọn ngôn ngữ"

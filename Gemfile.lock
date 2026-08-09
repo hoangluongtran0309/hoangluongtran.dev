@@ -1,0 +1,18 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    asciidoctor (2.0.26)
+    rouge (5.1.0)
+      strscan (~> 3.1)
+    strscan (3.1.8)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  asciidoctor
+  rouge
+
+BUNDLED WITH
+   2.6.9

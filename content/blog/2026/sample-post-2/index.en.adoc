@@ -1,0 +1,16 @@
+---
+title: "Sample post 2"
+date: 2026-07-31T09:00:00+07:00
+tags: ["sample"]
+summary: "A second dummy post, without an image — used to check the multi-post list, pagination, and tags."
+draft: false
+---
+
+= Sample post 2
+
+This is a second *sample* post (dummy content), with no image — used to
+check how the UI looks with more than one post in the list: date ordering,
+tag display, and pagination.
+
+The content here carries no meaning — it only fills the page for UI-testing
+purposes.

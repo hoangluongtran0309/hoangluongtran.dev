@@ -1,0 +1,97 @@
+{{ define "main" }}
+{{ if eq .Type "page" }}
+  {{/*
+    Trang leaf-list kiểu About/Projects: render nội dung _index.adoc.
+    Projects khác About ở chỗ vẫn cần liệt kê sub-page (từng project là 1
+    page bundle thật, có URL riêng — không giống reference, nơi /projects/
+    là 1 trang tĩnh viết tay, không có sub-page thật). Không có file layout
+    reference tương ứng cho phần lưới này — tự thiết kế, tái dùng đúng
+    markup/CSS .projects-grid đã xây khi làm homepage (đã gỡ khỏi homepage
+    theo yêu cầu, giờ chuyển hẳn về đây — nơi hợp lý hơn).
+  */}}
+  <article class="content">
+    <h1>{{ .Title }}</h1>
+    {{ .Content }}
+    {{ if eq .Section "projects" }}
+      {{/*
+        Pagination đồng bộ với homepage/blog list: cùng dùng .Paginate +
+        partials/paginator.html. Page size 6 (nhỏ hơn 10 của blog/homepage)
+        vì card ngang chiếm nhiều chiều cao hơn item post-list — cùng
+        component/hành vi, khác số lượng/trang cho hợp lý theo layout.
+        Chưa hiện gì (chỉ 3 project) tới khi > 6 project, paginator.html tự
+        ẩn khi TotalPages <= 1.
+      */}}
+      {{ $paginator := .Paginate .RegularPages 6 }}
+      {{ with $paginator.Pages }}
+        <ul class="projects-grid">
+          {{ range . }}
+            {{ $project := . }}
+            <li class="projects-grid__card">
+              <a href="{{ .RelPermalink }}">
+                {{ with .Params.images }}
+                  {{ with $project.Resources.Get (index . 0) }}
+                    {{ $cover := .Resize "480x270 q80" }}
+                    <img class="projects-grid__cover" src="{{ $cover.RelPermalink }}" alt="">
+                  {{ end }}
+                {{ end }}
+                <div class="projects-grid__body">
+                  {{ with .Params.icon }}<img class="projects-grid__icon" src="{{ . }}" alt="">{{ end }}
+                  <span class="projects-grid__title">{{ .Title }}</span>
+                  {{ with .Params.subtitle }}<span class="projects-grid__subtitle">{{ . }}</span>{{ end }}
+                </div>
+              </a>
+            </li>
+          {{ end }}
+        </ul>
+      {{ end }}
+      {{ partial "paginator.html" . }}
+    {{ end }}
+  </article>
+  {{/*
+    Newsletter form chỉ ở About (bám đúng vị trí trong reference — trang
+    Projects của reference không có form này). Section-scoped thay vì gộp
+    chung nhánh "page" để không tự động thêm vào Projects hay các trang
+    page-type khác sau này.
+  */}}
+  {{ if eq .Section "about" }}
+    {{ partial "newsletter-signup-form.html" (dict "placement" "about") }}
+  {{ end }}
+{{ else }}
+  {{/*
+    Blog archive (/blog/) — bám cấu trúc reference: heading + count riêng
+    (không dùng .Title mặc định "Blog" của section không có _index.adoc),
+    mỗi item date/title/tags (không có summary, khác homepage's
+    recent-posts) dùng lại markup+CSS đã có sẵn từ layouts/index.html.
+    Pagination: cùng page size (10) + cùng partials/paginator.html với
+    homepage's recent-posts — đồng bộ hành vi/giao diện phân trang trên
+    cả 2 nơi liệt kê bài viết.
+  */}}
+  {{ $paginator := .Paginate .Pages 10 }}
+  <section class="recent-posts">
+    <div class="recent-posts__header">
+      <h1>{{ i18n "blogArchiveHeading" }}</h1>
+      <span class="recent-posts__count">{{ i18n "showingXofY" (dict "Count" (len $paginator.Pages) "Total" (len .Pages)) }}</span>
+    </div>
+
+    {{ .Content }}
+
+    <ul class="post-list">
+      {{ range $paginator.Pages }}
+        <li>
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "02 Jan 2006" }}</time>
+          <a href="{{ .RelPermalink }}">{{ .Title }}{{ if .Draft }} · {{ i18n "draft" }}{{ end }}</a>
+          {{ with .Params.tags }}
+            <span class="tags-list">
+              {{ range . }}
+                <a class="tag-pill" href="{{ "/tags/" | relLangURL }}{{ . | urlize }}/">{{ . }}</a>
+              {{ end }}
+            </span>
+          {{ end }}
+        </li>
+      {{ end }}
+    </ul>
+
+    {{ partial "paginator.html" . }}
+  </section>
+{{ end }}
+{{ end }}

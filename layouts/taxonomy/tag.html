@@ -1,0 +1,29 @@
+{{ define "main" }}
+{{/*
+  Bám cấu trúc reference (taxonomy/tag.html): heading + count + tags per
+  item — cùng pattern vừa làm ở _default/list.html (blog archive), tái
+  dùng markup/CSS .recent-posts/.post-list đã có.
+*/}}
+<section class="recent-posts">
+  <div class="recent-posts__header">
+    <h1>{{ i18n "tagPageTitle" (dict "Tag" .Title) }}</h1>
+    <span class="recent-posts__count">{{ i18n "articleCount" (dict "Count" (len .Pages)) }}</span>
+  </div>
+
+  <ul class="post-list">
+    {{ range .Pages }}
+      <li>
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "02 Jan 2006" }}</time>
+        <a href="{{ .RelPermalink }}">{{ .Title }}{{ if .Draft }} · {{ i18n "draft" }}{{ end }}</a>
+        {{ with .Params.tags }}
+          <span class="tags-list">
+            {{ range . }}
+              <a class="tag-pill" href="{{ "/tags/" | relLangURL }}{{ . | urlize }}/">{{ . }}</a>
+            {{ end }}
+          </span>
+        {{ end }}
+      </li>
+    {{ end }}
+  </ul>
+</section>
+{{ end }}

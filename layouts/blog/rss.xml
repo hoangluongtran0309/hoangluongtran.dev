@@ -1,0 +1,73 @@
+{{- /*
+  Feed cho section blog (đã bị tắt ở nơi khác qua [outputs] trong
+  hugo.toml — chỉ content/blog/_index.*.adoc bật lại RSS qua front
+  matter `outputs`). Dựa trên template mặc định của Hugo (embedded
+  layouts/_default/rss.xml) nhưng đổi .Summary → .Content theo yêu cầu
+  full-content, cộng <image>.
+
+  Full content của bài AsciiDoc chứa src=/href= tương đối (ảnh page
+  bundle, heading anchor, cross-reference nội bộ) — đúng trên trang HTML
+  thật nhưng vỡ khi nhúng vào RSS (base URL khác). Đoạn dưới tự chuyển
+  chúng thành absolute URL dựa trên .Permalink, không cần lookahead (Go
+  regexp/RE2 không hỗ trợ):
+    1. Đánh dấu mọi khoảng trắng + src=" / href=" (khoảng trắng phía
+       trước để tránh dính nhầm data-src=) bằng marker.
+    2. Marker theo sau bởi scheme/absolute (http(s)://, //, /) thì bỏ
+       marker, giữ nguyên giá trị.
+    3. Marker theo sau bởi # (anchor cùng trang, vd cross-reference
+       AsciiDoc) thì thay bằng .Permalink nối liền fragment.
+    4. Marker còn lại (đường dẫn tương đối thật, vd ảnh page bundle) thì
+       thay bằng .Permalink.
+*/ -}}
+{{- $pctx := . -}}
+{{- if .IsHome -}}{{ $pctx = .Site }}{{- end -}}
+{{- $pages := $pctx.RegularPages -}}
+{{- $limit := .Site.Config.Services.RSS.Limit -}}
+{{- if ge $limit 1 -}}
+  {{- $pages = $pages | first $limit -}}
+{{- end -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ if eq .Title .Site.Title }}{{ .Site.Title }}{{ else }}{{ with .Title }}{{ . }} — {{ end }}{{ .Site.Title }}{{ end }}</title>
+    <link>{{ .Permalink }}</link>
+    <description>{{ if ne .Title .Site.Title }}{{ with .Title }}Recent {{ . }} {{ end }}{{ else }}Recent content {{ end }}on {{ .Site.Title }}</description>
+    <generator>Hugo -- gohugo.io</generator>
+    {{- with .Site.Language.Locale }}
+    <language>{{ . }}</language>
+    {{- end }}
+    {{- with .Site.Copyright }}
+    <copyright>{{ . }}</copyright>
+    {{- end }}
+    {{- if not .Date.IsZero }}
+    <lastBuildDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</lastBuildDate>
+    {{- end }}
+    {{- with .Site.Params.favicon }}
+    <image>
+      <url>{{ . | absURL }}</url>
+      <title>{{ $.Site.Title }}</title>
+      <link>{{ $.Permalink }}</link>
+    </image>
+    {{- end }}
+    {{- with .OutputFormats.Get "RSS" }}
+    {{ printf "<atom:link href=%q rel=\"self\" type=%q />" .Permalink .MediaType | safeHTML }}
+    {{- end }}
+    {{- range $pages }}
+    {{- $marker := "@@RSSREL@@" -}}
+    {{- $content := .Content -}}
+    {{- $content = replaceRE ` (src|href)="` (printf " $1=\"%s" $marker) $content -}}
+    {{- $content = replaceRE (printf `%s(https?://)` $marker) "$1" $content -}}
+    {{- $content = replaceRE (printf `%s(//)` $marker) "$1" $content -}}
+    {{- $content = replaceRE (printf `%s(/)` $marker) "$1" $content -}}
+    {{- $content = replaceRE (printf `%s(#)` $marker) (printf "%s$1" .Permalink) $content -}}
+    {{- $content = replaceRE $marker .Permalink $content -}}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ .Permalink }}</link>
+      <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</pubDate>
+      <guid>{{ .Permalink }}</guid>
+      <description>{{ $content | transform.XMLEscape | safeHTML }}</description>
+    </item>
+    {{- end }}
+  </channel>
+</rss>

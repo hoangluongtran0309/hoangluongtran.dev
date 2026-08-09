@@ -1,0 +1,9 @@
+---
+title: "Sample Project C"
+subtitle: "Dữ liệu mẫu — chỉ dùng để test giao diện /projects/"
+icon: ""
+images: ["cover.png"]
+draft: false
+---
+
+_(Đây là project mẫu, không phải sản phẩm thật — dùng để kiểm tra layout danh sách/trang chi tiết project.)_

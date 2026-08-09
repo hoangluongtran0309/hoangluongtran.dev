@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:1313/blog/)",
+      "Bash(curl -s http://localhost:1313/blog/page/2/ -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:1313/page/2/ -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:1313/blog/ -o /dev/null -w \"blog: %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:1313/blog/page/2/ -o /dev/null -w \"blog page2: %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:1313/ -o /dev/null -w \"home: %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:1313/page/2/ -o /dev/null -w \"home page2: %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:1313/projects/ -o /dev/null -w \"projects: %{http_code}\\\\n\")"
+    ]
+  }
+}

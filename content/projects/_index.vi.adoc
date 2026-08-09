@@ -1,0 +1,11 @@
+---
+title: "Projects"
+type: "page"
+draft: false
+---
+
+= Projects
+
+Danh sách các project cá nhân sẽ được cập nhật tại đây.
+
+_(Trang này đang được xây dựng — nội dung project thực tế sẽ được bổ sung sau.)_

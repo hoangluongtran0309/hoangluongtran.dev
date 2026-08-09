@@ -1,0 +1,60 @@
+{{- /*
+  Sinh social card 1200x630 tự động bằng Hugo image processing thuần
+  (không dùng tool ngoài): overlay text lên assets/images/twittercard/template.png
+  qua các lớp images.Filter(images.Text(...)) nối chuỗi — tiêu đề bài viết,
+  tên site, và danh sách tag (nếu có).
+
+  Bố cục lấy cảm hứng từ _reference/wimdeblauwe-com (avatar ghim góc dưới-trái
+  của template.png, tên site đặt ngang hàng cạnh avatar) nhưng dùng avatar
+  thật của mình (không phải của Wim) và tông màu xanh lá theo site thay vì
+  kem/cam của reference — xem template.png. Avatar chiếm dải x:[70,350]
+  y:[290,570] trong ảnh nền 1200x630 (đã bake sẵn, không xử lý ở đây), nên
+  toạ độ text bên dưới né vùng này: title/tags dồn lên nửa trên, site name
+  kéo sang phải ngang tầm avatar thay vì nằm dưới cùng bên trái như bản cũ.
+
+  Font: khớp đúng --font-heading/--font-sans hiện tại của site (Liberation
+  Serif/Sans, xem assets/scss/main.scss) — title/tags dùng
+  LiberationSerif-Bold (heading), site name dùng LiberationSans-Regular
+  (body), cùng cặp font site thật đang dùng. images.Text cần 1 file TTF
+  thô (không đọc được "system font theo tên" như CSS), nên dùng bản đầy
+  đủ không-subset trong assets/fonts/ (khác bản .woff2 đã subset ở
+  static/fonts/ cho web) — cả 2 đều cùng nguồn font hệ thống local, SIL
+  OFL (assets/fonts/OFL-Liberation.txt).
+*/ -}}
+{{- $fontTitle := resources.Get "fonts/LiberationSerif-Bold.ttf" -}}
+{{- $fontBody := resources.Get "fonts/LiberationSans-Regular.ttf" -}}
+{{- $img := resources.Get "images/twittercard/template.png" -}}
+
+{{- if and $img $fontTitle $fontBody -}}
+  {{- $img = $img.Filter (images.Text .LinkTitle (dict
+        "color" "#ffffff"
+        "size" 64
+        "linespacing" 6
+        "x" 80
+        "y" 190
+        "font" $fontTitle
+      )) -}}
+
+  {{- $img = $img.Filter (images.Text .Site.Title (dict
+        "color" "#86efac"
+        "size" 32
+        "linespacing" 2
+        "x" 380
+        "y" 460
+        "font" $fontBody
+      )) -}}
+
+  {{- with .Params.tags -}}
+    {{- $tags := delimit . "  ·  " -}}
+    {{- $img = $img.Filter (images.Text (upper $tags) (dict
+          "color" "#4ade80"
+          "size" 26
+          "linespacing" 2
+          "x" 80
+          "y" 75
+          "font" $fontTitle
+        )) -}}
+  {{- end -}}
+
+  {{- return $img -}}
+{{- end -}}

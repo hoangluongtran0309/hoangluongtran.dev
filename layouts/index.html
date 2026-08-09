@@ -1,0 +1,115 @@
+{{ define "main" }}
+{{/*
+  Trang chủ — cấu trúc tham khảo wimdeblauwe.com/ (không copy nội dung/ảnh),
+  toàn bộ dữ liệu động từ hugo.toml [params] + content/_index.adoc +
+  content/projects/*, xem CLAUDE.md và plan "homepage" để biết field list.
+*/}}
+
+{{/*
+  Hero — CSS Grid 2 cột (assets/scss/main.scss): tagline/headline/bio xếp
+  dọc cột trái, portrait ghim cột phải cao bằng cả khối text ở desktop,
+  đổi bố cục ở mobile (xem .hero trong SCSS). DOM order vẫn
+  tagline->headline->portrait->bio để đọc được nếu CSS tắt.
+*/}}
+<section class="hero">
+  {{ with .Site.Params.techStack }}
+    <p class="hero__tagline">{{ delimit . " · " }}</p>
+  {{ end }}
+  {{ with .Site.Params.heroHeadline }}
+    <h1 class="hero__headline">{{ . | markdownify }}</h1>
+  {{ end }}
+  {{/*
+    Ảnh đi qua Hugo Pipes (assets/images/, không phải static/) để resize +
+    nén + fingerprint lúc build — ảnh gốc người dùng upload có thể rất
+    nặng (ảnh chụp iPhone gốc ~800KB, 2048x2048) và mang theo EXIF/GPS,
+    Resize ở đây re-encode lại nên loại bỏ metadata gốc luôn, không chỉ
+    giảm dung lượng.
+  */}}
+  {{ with .Site.Params.heroImage }}
+    {{ with resources.Get . }}
+      {{ $portrait := .Resize "480x480 q75" }}
+      <img class="hero__portrait" src="{{ $portrait.RelPermalink }}" alt="{{ $.Site.Params.heroImageAlt | default "" }}" width="240" height="240">
+    {{ end }}
+  {{ end }}
+  <div class="hero__bio">
+    {{ .Content }}
+  </div>
+</section>
+
+{{/*
+  Search — ô luôn hiển thị (không còn <details> ẩn/hiện). Gõ tới đâu,
+  assets/js/main.js gọi thẳng Pagefind low-level API (`pagefind.search()`,
+  lazy-import lúc focus) tới đó, kết quả thế chỗ list "Bài viết gần đây"
+  ngay tại section bên dưới (swap-in-place theo #post-list/#search-results,
+  không phải dropdown riêng). JS tắt: input vẫn hiện nhưng không phản hồi —
+  chấp nhận được vì search vốn chỉ progressive-enhance (CLAUDE.md §4
+  invariant #1), menu/nội dung chính không phụ thuộc JS. Mọi label hiển thị
+  qua JS đều lấy từ data-* do i18n render sẵn ở đây (invariant #9) —
+  main.js không hardcode string ngôn ngữ nào.
+*/}}
+{{ $topTags := first 3 .Site.Taxonomies.tags.ByCount }}
+<div class="search-box">
+  <label class="search-box__field" for="search-input">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input
+      id="search-input"
+      type="search"
+      autocomplete="off"
+      placeholder="{{ i18n "searchPlaceholder" }}"
+      data-lang="{{ .Site.Language.Lang }}">
+  </label>
+  <p class="search-box__hint">
+    {{ i18n "searchHint" }}
+    {{ if $topTags }}
+      {{ range $i, $t := $topTags }}{{ if $i }}, {{ end }}<b>{{ $t.Name }}</b>{{ end }}
+    {{ end }}
+  </p>
+</div>
+
+{{ with .Site.Params.featuredProject }}
+  {{ partial "featured-project.html" . }}
+{{ end }}
+
+{{ $blog := .Site.GetPage "section" "blog" }}
+{{ $posts := slice }}
+{{ if $blog }}{{ $posts = sort $blog.RegularPages "Date" "desc" }}{{ end }}
+{{ $paginator := .Paginate $posts 10 }}
+
+<section class="recent-posts">
+  <div class="recent-posts__header">
+    <h2 id="post-list-heading"
+        data-default-heading="{{ i18n "recentPostsHeading" }}"
+        data-search-heading="{{ i18n "searchResultsHeading" }}">{{ i18n "recentPostsHeading" }}</h2>
+    <span class="recent-posts__count" id="post-count"
+          data-default-count="{{ i18n "showingXofY" (dict "Count" (len $paginator.Pages) "Total" (len $posts)) }}"
+          data-search-count-template="{{ i18n "searchResultsFor" }}">{{ i18n "showingXofY" (dict "Count" (len $paginator.Pages) "Total" (len $posts)) }}</span>
+  </div>
+
+  <ul class="post-list" id="post-list">
+    {{ range $paginator.Pages }}
+      <li>
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "02 Jan 2006" }}</time>
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        {{ with .Params.tags }}
+          <span class="tags-list">
+            {{ range . }}
+              <a class="tag-pill" href="{{ "/tags/" | relLangURL }}{{ . | urlize }}/">{{ . }}</a>
+            {{ end }}
+          </span>
+        {{ end }}
+        <p class="post-list__summary">{{ (.Params.summary | default .Summary) | plainify }}</p>
+      </li>
+    {{ end }}
+  </ul>
+
+  {{/* Danh sách kết quả search — JS render lúc gõ, rỗng/ẩn mặc định. */}}
+  <ul class="post-list" id="search-results" hidden></ul>
+
+  <p class="search-no-results" id="search-no-results" data-template="{{ i18n "searchNoResultsFor" }}" hidden></p>
+
+  <div id="post-list-footer">
+    {{ partial "paginator.html" . }}
+    <a class="archive-link" href="{{ "/blog/" | relLangURL }}">{{ i18n "browseArchive" }}</a>
+  </div>
+</section>
+{{ end }}

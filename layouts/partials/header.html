@@ -1,0 +1,40 @@
+<header class="site-header">
+  <div class="container">
+    <a class="site-title" href="{{ "/" | relLangURL }}">{{ .Site.Title }}</a>
+    <div class="site-header__right">
+      <nav>
+        <ul>
+          {{/*
+            So sánh active-state phải qua relLangURL ở CẢ 2 vế — .URL của
+            menu entry là path language-agnostic ("/projects"), còn
+            $.RelPermalink của trang hiện tại LUÔN có prefix ngôn ngữ khi
+            không phải defaultContentLanguage (vd "/en/projects/"). So
+            trực tiếp .URL (không prefix) với RelPermalink (có prefix) nên
+            "is-active" không bao giờ khớp trên các trang /en/* — bug phát
+            hiện khi user báo gạch dưới active sai ở bản English.
+          */}}
+          {{ $current := strings.TrimSuffix "/" $.RelPermalink }}
+          {{ range .Site.Menus.main }}
+            {{ $entryURL := strings.TrimSuffix "/" (.URL | relLangURL) }}
+            <li>
+              <a href="{{ .URL | relLangURL }}" class="{{ if eq $current $entryURL }}is-active{{ end }}">{{ .Name }}</a>
+            </li>
+          {{ end }}
+        </ul>
+      </nav>
+      {{ partial "language-switcher.html" . }}
+      <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false"
+              aria-label="{{ i18n "themeToggleLabelDefault" }}"
+              data-label-dark="{{ i18n "themeToggleLabelDark" }}"
+              data-label-light="{{ i18n "themeToggleLabelLight" }}">
+        <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>
+        </svg>
+        <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>

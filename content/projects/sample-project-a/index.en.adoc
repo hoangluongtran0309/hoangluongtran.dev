@@ -1,0 +1,9 @@
+---
+title: "Sample Project A"
+subtitle: "Dummy data — for testing the /projects/ UI only"
+icon: ""
+images: ["cover.png"]
+draft: false
+---
+
+_(This is a sample project, not a real product — used to check the project list/detail page layout.)_

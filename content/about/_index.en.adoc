@@ -1,0 +1,23 @@
+---
+title: "About"
+type: "page"
+draft: false
+---
+
+= About
+
+// Placeholder — real content will be filled in after review, same voice as
+// the placeholder in content/_index.en.adoc (homepage). Structure borrowed
+// newsletter signup form (form added in the layout, see
+// layouts/_default/list.html, `eq .Section "about"` branch, not here).
+// Dropped the donate/PayPal section from the reference — not applicable.
+I'm a software engineer, mainly working with Spring Boot and Kotlin. In my
+spare time I write about what I learn along the way.
+
+All opinions on this blog are my own.
+
+== Social links
+
+* GitHub: https://github.com/hoangluongtran0309[https://github.com/hoangluongtran0309]
+* LinkedIn: https://linkedin.com/in/hoangluongtran0309/[https://linkedin.com/in/hoangluongtran0309/]
+* X: https://x.com/luongtran0309[https://x.com/luongtran0309]

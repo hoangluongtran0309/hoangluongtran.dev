@@ -1,0 +1,23 @@
+---
+title: "About"
+type: "page"
+draft: false
+---
+
+= About
+
+// Placeholder — nội dung thật sẽ được điền sau khi review, cùng giọng văn
+// placeholder ở content/_index.vi.adoc (trang chủ). Cấu trúc tham khảo
+// -> form đăng ký newsletter (form thêm ở layout, xem
+// layouts/_default/list.html nhánh `eq .Section "about"`, không viết ở
+// đây). Bỏ phần donate/PayPal của reference — không áp dụng.
+Mình là kỹ sư phần mềm, chủ yếu làm việc với Spring Boot và Kotlin. Ngoài giờ
+mình viết về những gì học được trong lúc làm.
+
+Mọi ý kiến trên blog này là quan điểm cá nhân.
+
+== Liên kết mạng xã hội
+
+* GitHub: https://github.com/hoangluongtran0309[https://github.com/hoangluongtran0309]
+* LinkedIn: https://linkedin.com/in/hoangluongtran0309/[https://linkedin.com/in/hoangluongtran0309/]
+* X: https://x.com/luongtran0309[https://x.com/luongtran0309]

@@ -1,0 +1,40 @@
+<!--
+  Netlify Forms — không có backend riêng để maintain. Netlify tự quét HTML
+  build ra (public/) lúc deploy để tìm form có data-netlify="true", không
+  cần khai báo gì thêm trong netlify.toml. Submission xem ở Netlify UI →
+  Site → Forms.
+
+  Nhận `placement` qua dict (CLAUDE.md §6: partial nhận data qua dict rõ
+  ràng) — gọi bằng partial "newsletter-signup-form.html" và 1 dict có key
+  "placement" (vd "post"/"about"/"footer"). Dùng để id/for không trùng khi
+  form xuất hiện >1 lần/trang (footer + cuối bài blog, hoặc footer + trang
+  About). LƯU Ý: không viết ví dụ bằng cú pháp action Go-template thật
+  trong comment này — HTML comment không che được nó, action vẫn bị thực
+  thi (đã tự gây đệ quy vô hạn ở đây khi thử, để lại làm bài học).
+-->
+{{ $placement := .placement | default "default" }}
+{{ $emailID := printf "newsletter-email-%s" $placement }}
+{{ $honeypotID := printf "newsletter-hp-%s" $placement }}
+<div class="newsletter{{ if eq $placement "footer" }} newsletter--footer{{ end }}">
+  <h3>{{ i18n "newsletterHeading" }}</h3>
+  <p>{{ i18n "newsletterBody" }}</p>
+  <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field"
+        action="{{ (site.GetPage "newsletter/thanks").RelPermalink }}">
+    <input type="hidden" name="form-name" value="newsletter">
+
+    <label for="{{ $emailID }}" class="visually-hidden">{{ i18n "newsletterEmailLabel" }}</label>
+    <input id="{{ $emailID }}" type="email" name="email" placeholder="{{ i18n "newsletterEmailPlaceholder" }}" required>
+
+    <!-- Honeypot chống bot — ẩn khỏi cả người dùng thật lẫn screen reader
+         (.hidden = display:none), tabindex=-1 để không lọt vào tab order.
+         Netlify tự động reject silently submission nào điền vào field
+         này (netlify-honeypot="bot-field" ở trên) — không cần JS/reCAPTCHA. -->
+    <p class="hidden">
+      <label for="{{ $honeypotID }}">{{ i18n "newsletterHoneypotLabel" }}</label>
+      <input id="{{ $honeypotID }}" name="bot-field" tabindex="-1" autocomplete="off">
+    </p>
+
+    <button type="submit">{{ i18n "newsletterSubmit" }}</button>
+  </form>
+  <p class="fine">{{ i18n "newsletterFinePrint" }}</p>
+</div>

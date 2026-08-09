@@ -1,0 +1,10 @@
+---
+title: "Đăng ký thành công!"
+type: "page"
+draft: false
+---
+
+Cảm ơn bạn đã đăng ký nhận bài viết mới. Từ giờ mỗi khi có bài viết mới,
+bạn sẽ nhận được email thông báo.
+
+link:/[← Về trang chủ]

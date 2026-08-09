@@ -1,0 +1,24 @@
+{{/*
+  Banner sản phẩm nổi bật — nhận dict qua `with .Site.Params.featuredProject`
+  ở layouts/index.html. Field: title, description, image (path trong
+  assets/images/, xử lý qua resources.Get), ctaPrimary.{label,url},
+  ctaSecondary.{label,url} (optional). Không render gì nếu .Site.Params.featuredProject
+  chưa được set — caller đã bọc bằng `with`.
+*/}}
+<section class="featured-project">
+  {{ with .image }}
+    {{ with resources.Get . }}
+      <img class="featured-project__image" src="{{ .RelPermalink }}" alt="">
+    {{ end }}
+  {{ end }}
+  <div class="featured-project__body">
+    {{ with .title }}<h2>{{ . }}</h2>{{ end }}
+    {{ with .description }}<p>{{ . }}</p>{{ end }}
+    {{ if or .ctaPrimary .ctaSecondary }}
+      <div class="featured-project__ctas">
+        {{ with .ctaPrimary }}<a class="btn btn--primary" href="{{ .url }}">{{ .label }}</a>{{ end }}
+        {{ with .ctaSecondary }}<a class="btn btn--secondary" href="{{ .url }}">{{ .label }}</a>{{ end }}
+      </div>
+    {{ end }}
+  </div>
+</section>

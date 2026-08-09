@@ -1,0 +1,13 @@
+---
+title: "Bài viết mẫu 6"
+date: 2026-07-27T09:00:00+07:00
+tags: ["mau"]
+summary: "Bài viết giả lập (không phải nội dung thật), dùng để kiểm tra phân trang và danh sách nhiều bài viết."
+draft: false
+---
+
+= Bài viết mẫu 6
+
+Đây là bài viết *mẫu* số 6 (dummy content), không mang nội dung thật — chỉ
+dùng để lấp đầy danh sách bài viết cho mục đích kiểm tra phân trang
+(pagination) và giao diện danh sách nhiều bài.

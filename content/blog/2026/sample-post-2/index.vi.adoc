@@ -1,0 +1,16 @@
+---
+title: "Bài viết mẫu 2"
+date: 2026-07-31T09:00:00+07:00
+tags: ["mau"]
+summary: "Bài viết giả lập thứ hai, không có ảnh — dùng để kiểm tra danh sách nhiều bài viết, phân trang và tag."
+draft: false
+---
+
+= Bài viết mẫu 2
+
+Đây là bài viết *mẫu* thứ hai (dummy content), không có ảnh minh hoạ — dùng
+để kiểm tra giao diện khi có nhiều hơn 1 bài trong danh sách: sắp xếp theo
+ngày, hiển thị tag, và phân trang.
+
+Nội dung ở đây không mang ý nghĩa gì — chỉ để lấp đầy trang cho mục đích
+kiểm thử giao diện.

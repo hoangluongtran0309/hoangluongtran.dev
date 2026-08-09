@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    Monogram "HL" — màu và font đồng bộ với assets/scss/main.scss: token
+    color-accent/color-on-accent (light #15803d/#f3faf4, dark
+    #4ade80/#0d2210) và token font-heading (Bitter, fallback Georgia/serif
+    — dùng thẳng fallback vì favicon SVG không load được webfont ngoài
+    đáng tin cậy). prefers-color-scheme để favicon tự đổi màu theo theme
+    trình duyệt, giống cách main.scss tự đổi theo :root/[data-theme].
+  -->
+  <style>
+    rect { fill: #15803d; }
+    text { fill: #f3faf4; }
+    @media (prefers-color-scheme: dark) {
+      rect { fill: #4ade80; }
+      text { fill: #0d2210; }
+    }
+  </style>
+  <rect width="32" height="32" rx="6"/>
+  <text x="16" y="22" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="700">HL</text>
+</svg>
