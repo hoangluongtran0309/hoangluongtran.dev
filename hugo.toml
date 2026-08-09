@@ -1,5 +1,5 @@
 baseURL = "https://hoangluongtran.dev/"
-googleAnalytics = "G-XXXXXXXXXX" # TODO: điền Measurement ID thật sau khi tạo GA4 property (Phase 8)
+googleAnalytics = "G-RLWB4T261E"
 
 mainSections = ["blog"]
 
