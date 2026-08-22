@@ -1,18 +1,22 @@
 ---
-title: "About"
+title: "Giới thiệu"
 type: "page"
 draft: false
 ---
 
-= About
+= Giới thiệu
 
-// Placeholder — nội dung thật sẽ được điền sau khi review, cùng giọng văn
-// placeholder ở content/_index.vi.adoc (trang chủ). Cấu trúc tham khảo
-// -> form đăng ký newsletter (form thêm ở layout, xem
-// layouts/_default/list.html nhánh `eq .Section "about"`, không viết ở
-// đây). Bỏ phần donate/PayPal của reference — không áp dụng.
-Mình là kỹ sư phần mềm, chủ yếu làm việc với Spring Boot và Kotlin. Ngoài giờ
-mình viết về những gì học được trong lúc làm.
+// Form đăng ký newsletter được thêm ở layout (xem
+// layouts/_default/list.html nhánh `eq .Section "about"`), không viết ở đây.
+Mình là kỹ sư phần mềm, làm backend với Java và Spring Boot.
+
+Công việc hằng ngày của mình xoay quanh việc xây dựng và bảo trì service phía
+server: thiết kế API, làm việc với JPA/Hibernate và Spring Security, và viết
+test cho những phần dễ vỡ nhất.
+
+Blog này là nơi mình ghi lại những gì học được trong lúc làm — chủ yếu về
+Spring Boot và hệ sinh thái Java: pattern dùng được, những chỗ hay vấp, và lý
+do đằng sau một lựa chọn kỹ thuật.
 
 Mọi ý kiến trên blog này là quan điểm cá nhân.
 

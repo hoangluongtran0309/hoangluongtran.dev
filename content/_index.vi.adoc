@@ -3,7 +3,8 @@ title: "Hoàng Lương Trần"
 type: "home"
 ---
 
-// Placeholder — nội dung thật sẽ được điền sau khi review. 2-3 câu, có thể
-// dùng link:...[] AsciiDoc để chèn link inline (vd. tới /projects/).
-Mình là kỹ sư phần mềm, chủ yếu làm việc với Spring Boot và Kotlin. Ngoài giờ
-mình viết về những gì học được trong lúc làm.
+// Giữ 2-3 câu để không phá layout hero. Có thể dùng link:...[] AsciiDoc để
+// chèn link inline (vd. tới /projects/).
+Mình là kỹ sư phần mềm, làm backend với Java và Spring Boot. Blog này là nơi
+mình ghi lại những gì học được trong lúc làm — chủ yếu quanh Spring Boot và hệ
+sinh thái Java.

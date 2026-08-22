@@ -3,7 +3,8 @@ title: "Hoang Luong Tran"
 type: "home"
 ---
 
-// Placeholder — real content will be filled in after review. 2-3 sentences,
-// can use link:...[] AsciiDoc syntax for inline links (e.g. to /en/projects/).
-I'm a software engineer, mainly working with Spring Boot and Kotlin. In my
-spare time I write about what I learn along the way.
+// Keep to 2-3 sentences so the hero layout holds. Can use link:...[] AsciiDoc
+// syntax for inline links (e.g. to /en/projects/).
+I'm a software engineer building backend services with Java and Spring Boot.
+This blog is where I write down what I learn along the way — mostly around
+Spring Boot and the wider Java ecosystem.

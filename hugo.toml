@@ -54,7 +54,7 @@ defaultContentLanguageInSubdir = false
   # image, ctaSecondary "GitHub" giữ nguyên từ [params] toàn cục — tên
   # riêng/thương hiệu, không dịch).
   [languages.en.params]
-    heroHeadline = "I build _developer tools_ that help ship software faster"
+    heroHeadline = "I build backends with _Java and Spring Boot_."
     heroImageAlt = "Portrait photo of Hoang Luong Tran"
     [languages.en.params.featuredProject]
       title = "Sample Project"
@@ -66,14 +66,14 @@ defaultContentLanguageInSubdir = false
   images = ["images/og-fallback.png"] # fallback OG/Twitter image khi trang không có ảnh riêng
   favicon = "favicon.svg"
 
-  # Tagline nhỏ trên hero (layouts/index.html) — 3-4 công nghệ chủ đạo, nối
-  # bằng " · ". TODO: chỉnh lại danh sách thật.
-  techStack = ["Java", "Spring Boot", "Kotlin", "Hugo"]
+  # Tagline nhỏ trên hero (layouts/index.html) — các công nghệ chủ đạo, nối
+  # bằng " · ".
+  techStack = ["Java", "Spring Boot"]
 
   # Headline lớn ở hero. Cú pháp markdown _..._ hoặc *...* để in nghiêng 1
   # cụm nhấn mạnh — render qua `| markdownify`, KHÔNG dùng cú pháp AsciiDoc.
-  # TODO: viết lại headline thật.
-  heroHeadline = "Mình xây _developer tools_ giúp việc release phần mềm nhanh hơn"
+  # Giữ ngắn và đơn giản, một ý duy nhất — không thêm mệnh đề phụ.
+  heroHeadline = "Mình xây backend bằng _Java và Spring Boot_."
 
   # Ảnh chân dung hero — path tính từ /static (giống cách params.favicon
   # trỏ), KHÔNG dùng chung params.images (field đó là OG fallback, mục đích
