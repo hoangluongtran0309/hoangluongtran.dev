@@ -1,0 +1,41 @@
+{{- /*
+  Fallback chain cho ảnh OG:
+    1. Ảnh riêng của trang (page resource hoặc URL tuyệt đối, từ front matter `images`)
+    2. Social card tự sinh (partial "opengraph/get-featured-image.html")
+    3. Ảnh site-wide mặc định (Site.Params.images)
+*/ -}}
+{{- $imgURL := "" -}}
+{{- with .Params.images -}}
+  {{- $imgPath := index . 0 -}}
+  {{- with $.Resources.Get $imgPath -}}
+    {{- $imgURL = .Permalink -}}
+  {{- else -}}
+    {{- $imgURL = $imgPath | absURL -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $imgURL -}}
+  {{- with partial "opengraph/get-featured-image.html" . -}}
+    {{- $imgURL = .Permalink -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $imgURL -}}
+  {{- with .Site.Params.images -}}
+    {{- $imgURL = (index . 0) | absURL -}}
+  {{- end -}}
+{{- end -}}
+{{- $description := .Params.summary | default .Description | default .Summary | plainify -}}
+<meta property="og:title" content="{{ .Title }}">
+{{ with $description }}<meta property="og:description" content="{{ . }}">{{ end }}
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:site_name" content="{{ .Site.Title }}">
+{{- /* og:locale muốn full locale tag (vi_VN/en_US), không phải bare Hugo .Lang. */}}
+{{ $ogLocale := dict "vi" "vi_VN" "en" "en_US" }}
+<meta property="og:locale" content="{{ index $ogLocale .Site.Language.Lang }}">
+{{ range .Translations }}
+  <meta property="og:locale:alternate" content="{{ index $ogLocale .Language.Lang }}">
+{{ end }}
+{{ if $imgURL }}<meta property="og:image" content="{{ $imgURL }}">{{ end }}
+{{ if .IsPage }}
+  <meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+{{ end }}

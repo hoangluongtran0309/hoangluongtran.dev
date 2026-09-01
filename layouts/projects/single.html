@@ -1,0 +1,27 @@
+{{ define "main" }}
+{{/*
+  Trang project con (vd /projects/sample-project-a/) — trước đây fallback về
+  _default/single.html, vốn hiện meta-row với .Date dù front matter không
+  có date, ra "01 Jan 0001" vô nghĩa. Layout riêng: bỏ hẳn meta-row ngày
+  tháng, hiện subtitle (đã có sẵn trong front matter nhưng chưa dùng ở
+  đâu) + CTA tuỳ chọn (ctaPrimary/ctaSecondary, cùng shape với
+  .Site.Params.featuredProject — tái dùng class .btn có sẵn), không bắt
+  buộc phải có.
+*/}}
+<article class="content">
+  <h1>{{ .Title }}</h1>
+  {{ with .Params.subtitle }}<p class="project-subtitle">{{ . }}</p>{{ end }}
+  {{ with .Params.images }}
+    {{ with $.Resources.Get (index . 0) }}
+      <img class="project-cover" src="{{ .RelPermalink }}" alt="" width="{{ .Width }}" height="{{ .Height }}">
+    {{ end }}
+  {{ end }}
+  {{ if or .Params.ctaPrimary .Params.ctaSecondary }}
+    <div class="featured-project__ctas">
+      {{ with .Params.ctaPrimary }}<a class="btn btn--primary" href="{{ .url }}">{{ .label }}</a>{{ end }}
+      {{ with .Params.ctaSecondary }}<a class="btn btn--secondary" href="{{ .url }}">{{ .label }}</a>{{ end }}
+    </div>
+  {{ end }}
+  {{ .Content }}
+</article>
+{{ end }}

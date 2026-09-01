@@ -1,0 +1,27 @@
+---
+title: "About"
+type: "page"
+draft: false
+---
+
+= About
+
+// Newsletter signup form is added in the layout (see
+// layouts/_default/list.html, `eq .Section "about"` branch), not here.
+I'm a software engineer working on backends with Java and Spring.
+
+My day-to-day work revolves around building and maintaining server-side
+services: designing APIs, working with JPA/Hibernate and Spring Security, and
+writing tests around the parts most likely to break.
+
+This blog is where I write down what I learn along the way — mostly Spring Boot
+and the wider Java ecosystem: patterns that hold up, the places I trip over, and
+the reasoning behind a technical choice.
+
+All opinions on this blog are my own.
+
+== Social links
+
+* GitHub: https://github.com/hoangluongtran0309[https://github.com/hoangluongtran0309]
+* LinkedIn: https://linkedin.com/in/hoangluongtran0309/[https://linkedin.com/in/hoangluongtran0309/]
+* X: https://x.com/luongtran0309[https://x.com/luongtran0309]

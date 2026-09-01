@@ -1,0 +1,39 @@
+{{ define "main" }}
+{{/*
+  Thanh progress đọc bài — assets/js/main.js cập nhật width theo % đã
+  cuộn qua trang. Không cần JS để đọc bài (chỉ progressive-enhance,
+  CLAUDE.md §4 invariant #1); JS tắt thì div vẫn render nhưng width luôn 0.
+*/}}
+<div class="progress" id="progress"></div>
+
+<div class="article-head">
+  {{ partial "post/breadcrumb.html" . }}
+  <h1 class="title">{{ .Title }}</h1>
+  {{ partial "post/meta.html" . }}
+</div>
+
+<article class="content" data-pagefind-body>
+  {{ .Content }}
+</article>
+
+{{ if or .PrevInSection .NextInSection }}
+<nav class="pagination">
+  {{ with .PrevInSection }}
+    <a href="{{ .RelPermalink }}" class="prev">
+      <span class="dir">{{ i18n "previousArticle" }}</span>
+      <span class="ptitle">{{ .Title }}</span>
+    </a>
+  {{ else }}
+    <span></span>
+  {{ end }}
+  {{ with .NextInSection }}
+    <a href="{{ .RelPermalink }}" class="next">
+      <span class="dir">{{ i18n "nextArticle" }}</span>
+      <span class="ptitle">{{ .Title }}</span>
+    </a>
+  {{ end }}
+</nav>
+{{ end }}
+
+{{ partial "newsletter-signup-form.html" (dict "placement" "post") }}
+{{ end }}

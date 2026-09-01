@@ -1,0 +1,13 @@
+<div class="meta-row">
+  <span class="date-reading">
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "02 Jan 2006" }}</time>
+    · {{ .ReadingTime }} {{ i18n "readingTime" }}{{ if .Draft }} · {{ i18n "draft" }}{{ end }}
+  </span>
+  {{ with .Params.tags }}
+    <span class="tags-list">
+      {{ range . }}
+        <a class="tag-pill" href="{{ "/tags/" | relLangURL }}{{ . | urlize }}/">{{ . }}</a>
+      {{ end }}
+    </span>
+  {{ end }}
+</div>

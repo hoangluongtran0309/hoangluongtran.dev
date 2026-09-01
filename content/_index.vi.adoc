@@ -1,0 +1,10 @@
+---
+title: "Hoàng Lương Trần"
+type: "home"
+---
+
+// Giữ 2-3 câu để không phá layout hero. Có thể dùng link:...[] AsciiDoc để
+// chèn link inline (vd. tới /projects/).
+Mình là kỹ sư phần mềm, làm backend với Java và Spring. Blog này là nơi mình
+ghi lại những gì học được trong lúc làm — pattern dùng được, chỗ hay vấp, và
+lý do đằng sau một lựa chọn kỹ thuật.

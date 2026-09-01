@@ -1,0 +1,24 @@
+{{- $imgURL := "" -}}
+{{- with .Params.images -}}
+  {{- $imgPath := index . 0 -}}
+  {{- with $.Resources.Get $imgPath -}}
+    {{- $imgURL = .Permalink -}}
+  {{- else -}}
+    {{- $imgURL = $imgPath | absURL -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $imgURL -}}
+  {{- with partial "opengraph/get-featured-image.html" . -}}
+    {{- $imgURL = .Permalink -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $imgURL -}}
+  {{- with .Site.Params.images -}}
+    {{- $imgURL = (index . 0) | absURL -}}
+  {{- end -}}
+{{- end -}}
+{{- $description := .Params.summary | default .Description | default .Summary | plainify -}}
+<meta name="twitter:card" content="{{ if $imgURL }}summary_large_image{{ else }}summary{{ end }}">
+<meta name="twitter:title" content="{{ .Title }}">
+{{ with $description }}<meta name="twitter:description" content="{{ . }}">{{ end }}
+{{ if $imgURL }}<meta name="twitter:image" content="{{ $imgURL }}">{{ end }}

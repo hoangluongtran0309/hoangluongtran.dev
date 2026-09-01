@@ -1,0 +1,154 @@
+baseURL = "https://hoangluongtran.dev/"
+googleAnalytics = "G-RLWB4T261E"
+
+mainSections = ["blog"]
+
+# vi phục vụ ở "/" (defaultContentLanguage, không có subdir); en ở "/en/".
+# Dùng `label` chứ không phải `languageName` — key cũ đã deprecated từ Hugo
+# 0.158.0 và warning mỗi build (bản pin hiện tại: 0.164.0, xem netlify.toml).
+# Template vẫn đọc tên hiển thị qua `.LanguageName` như trước, không đổi gì
+# phía template. Menu chuyển vào đây (per-language) vì Hugo không tự dịch
+# `.Name` của 1 menu toàn cục — xem CLAUDE.md §3 (convention file-suffix
+# i18n) để biết lý do chọn cách tổ chức content tương ứng.
+defaultContentLanguage = "vi"
+defaultContentLanguageInSubdir = false
+
+[languages.vi]
+  label = "Tiếng Việt"
+  title = "Hoàng Lương Trần"
+  copyright = "© 2026 Hoàng Lương Trần"
+  weight = 1
+  [[languages.vi.menu.main]]
+    name = "Blog"
+    url = "/"
+    weight = 1
+  [[languages.vi.menu.main]]
+    name = "Dự án"
+    url = "/projects"
+    weight = 2
+  [[languages.vi.menu.main]]
+    name = "Giới thiệu"
+    url = "/about"
+    weight = 3
+
+[languages.en]
+  label = "English"
+  title = "Hoang Luong Tran"
+  copyright = "© 2026 Hoang Luong Tran"
+  weight = 2
+  [[languages.en.menu.main]]
+    name = "Blog"
+    url = "/"
+    weight = 1
+  [[languages.en.menu.main]]
+    name = "Projects"
+    url = "/projects"
+    weight = 2
+  [[languages.en.menu.main]]
+    name = "About"
+    url = "/about"
+    weight = 3
+  # Override từng field cần dịch — đã verify Hugo deep-merge
+  # [languages.en.params] lên trên [params] toàn cục theo field, không
+  # phải thay thế cả bảng, nên chỉ cần khai field khác bản VI.
+  [languages.en.params]
+    heroHeadline = "I build backends with _Java and Spring_."
+    heroImageAlt = "Portrait photo of Hoang Luong Tran"
+
+[params]
+  # KHÔNG khai `images` ở cấp site (bậc 3 trong fallback chain của
+  # layouts/partials/opengraph/*.html: front matter `images` → social card
+  # tự sinh → Site.Params.images). Lý do: get-featured-image.html luôn trả
+  # về ảnh cho MỌI trang miễn là assets/images/twittercard/template.png +
+  # 2 file TTF trong assets/fonts/ còn tồn tại, nên bậc 3 chỉ chạm tới khi
+  # chính mấy asset đó hỏng/mất. Đúng lúc đó, trỏ vào 1 path không có thật
+  # sẽ phát ra <meta og:image> 404 cho crawler — tệ hơn là không phát gì:
+  # twitter-cards.html đã tự hạ xuống `summary` (thay vì
+  # summary_large_image) khi không có ảnh, tức đã degrade đúng cách sẵn.
+  # Nếu sau này muốn có fallback thật, phải thêm file ảnh vào static/ rồi
+  # mới khai lại field này — đừng khai path trước khi file tồn tại.
+  favicon = "favicon.svg"
+
+  # Tagline nhỏ trên hero (layouts/index.html) — các công nghệ chủ đạo, nối
+  # bằng " · ".
+  techStack = ["Java", "Spring", "Thymeleaf"]
+
+  # Headline lớn ở hero. Cú pháp markdown _..._ hoặc *...* để in nghiêng 1
+  # cụm nhấn mạnh — render qua `| markdownify`, KHÔNG dùng cú pháp AsciiDoc.
+  # Giữ ngắn và đơn giản, một ý duy nhất — không thêm mệnh đề phụ.
+  heroHeadline = "Mình xây backend bằng _Java và Spring_."
+
+  # Ảnh chân dung hero — path tính từ /assets, KHÔNG phải /static:
+  # layouts/index.html đọc field này qua `resources.Get` rồi
+  # `.Resize "480x480 q75"` (Hugo Pipes), nên file thật nằm ở
+  # assets/images/avatar.jpg. Khác params.favicon — field đó nhả thẳng ra
+  # <link href> nên mới tính từ /static. Đổi sang static/ sẽ làm
+  # `resources.Get` trả nil và block `with` ở index.html im lặng không
+  # render ảnh (không báo lỗi build).
+  heroImage = "images/avatar.jpg"
+  heroImageAlt = "Ảnh chân dung Hoàng Lương Trần"
+
+  # Social icons ở footer (layouts/partials/footer.html) — để trống thì icon
+  # tương ứng không render (partial chỉ `with` khi có giá trị).
+  [params.social]
+    github = "https://github.com/hoangluongtran0309"
+    linkedin = "https://linkedin.com/in/hoangluongtran0309/"
+    x = "https://x.com/luongtran0309"
+
+  # Banner sản phẩm nổi bật (layouts/partials/featured-project.html) — khai
+  # bảng [params.featuredProject] (title/description/image/ctaPrimary/
+  # ctaSecondary) thì section hiện ở trang chủ; không khai thì ẩn hoàn toàn.
+  # Hiện chưa có project thật nên để trống.
+
+[taxonomies]
+  tag = "tags"
+
+# RSS chỉ bật cho section blog (content/blog/_index.*.adoc override qua
+# front matter `outputs`) — tắt mặc định ở home/section/taxonomy/term để
+# tránh feed trộn lẫn project pages + trang newsletter/thanks không có
+# date. Xem layouts/blog/rss.xml.
+[services.rss]
+  limit = 20
+
+[outputs]
+  home = ["HTML"]
+  section = ["HTML"]
+  taxonomy = ["HTML"]
+  term = ["HTML"]
+
+[privacy.googleAnalytics]
+  anonymizeIP = true
+  respectDoNotTrack = true
+  useSessionStorage = true
+
+[security]
+  enableInlineShortcodes = false
+
+[security.exec]
+  allow = ['^dart-sass-embedded$', '^go$', '^npx$', '^postcss$', '^node$', 'asciidoctor']
+  osEnv = ['(?i)^(PATH|PATHEXT|APPDATA|TMP|TEMP|TERM|GEM_PATH)$']
+
+[security.funcs]
+  getenv = ['^HUGO_']
+
+[security.http]
+  methods = ['(?i)GET|POST']
+  urls = ['.*']
+
+[markup]
+  [markup.asciidocExt]
+    extensions = []
+    workingFolderCurrent = true
+    trace = false
+    failureLevel = "fatal"
+
+    [markup.asciidocExt.attributes]
+      sectanchors = ""
+      "source-highlighter" = "rouge"
+      # class (not style): inline-style mode bakes fixed light-theme hex colors
+      # directly onto <pre>, which can't respond to dark mode. Class mode emits
+      # stable token classes (.k, .s, .nc, ...) and the actual colors — github
+      # light + github dark, generated via `bundle exec rougify style` — live in
+      # assets/scss/main.scss (see "Rouge syntax highlighting" section there).
+      # rouge-style is intentionally unset: it only affects inline-style mode.
+      "rouge-css" = "class"

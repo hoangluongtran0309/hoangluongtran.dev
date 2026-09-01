@@ -1,0 +1,35 @@
+{{- /*
+  Snippet GA4 tự viết, KHÔNG dùng Hugo's `_internal/google_analytics.html`.
+
+  Lý do: internal template hiện đại của Hugo (gtag.js/GA4) không còn đọc
+  `[privacy.googleAnalytics] anonymizeIP`/`useSessionStorage` nữa (verify bằng
+  `strings` trên binary Hugo — 0 kết quả cho 2 key này) — chỉ `respectDoNotTrack`
+  còn tác dụng thật, mặc định vẫn dùng cookie `_ga`. CLAUDE.md §4 invariant 6
+  yêu cầu "không cookie-based", nên tự set `client_storage: 'none'` (GA4
+  không lưu client ID bền vững qua cookie/localStorage, ephemeral theo session)
+  để đáp ứng đúng invariant thay vì phụ thuộc vào 1 config key đã thành no-op.
+*/ -}}
+{{- $gaID := .Site.Config.Services.GoogleAnalytics.ID -}}
+{{- if $gaID -}}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaID }}"></script>
+<script>
+  var doNotTrack = false;
+  {{- if .Site.Config.Privacy.GoogleAnalytics.RespectDoNotTrack }}
+  (function () {
+    var dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+    doNotTrack = dnt == "1" || dnt == "yes";
+  })();
+  {{- end }}
+  if (!doNotTrack) {
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+    gtag("config", "{{ $gaID }}", {
+      client_storage: "none", // không cookie/localStorage bền vững — client ID chỉ tồn tại trong session hiện tại
+      anonymize_ip: true, // GA4 tự anonymize IP phía server; giữ flag này để tường minh ý định
+    });
+  }
+</script>
+{{- end -}}

@@ -1,0 +1,11 @@
+---
+title: "Projects"
+type: "page"
+draft: false
+---
+
+= Projects
+
+A list of personal projects will be updated here.
+
+_(This page is under construction — real project content will be added later.)_

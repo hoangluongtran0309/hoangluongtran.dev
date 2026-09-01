@@ -1,0 +1,29 @@
+[build]
+  publish = "public"
+  command = "hugo && npx -y pagefind --site public"
+
+[build.environment]
+  HUGO_VERSION = "0.164.0"
+  NODE_VERSION = "24"
+  RUBY_VERSION = "3.4.10"
+
+[context.production.environment]
+  HUGO_ENV = "production"
+
+[context.deploy-preview]
+  command = "hugo -D -F -b $DEPLOY_PRIME_URL/ && npx -y pagefind --site public"
+
+[context.branch-deploy]
+  command = "hugo -D -F -b $DEPLOY_PRIME_URL/ && npx -y pagefind --site public"
+
+# Netlify mặc định chỉ serve public/404.html (bản vi) cho MỌI path không
+# khớp, kể cả path dưới /en/ — dù Hugo đã build sẵn public/en/404.html
+# (đúng <html lang=en>, text tiếng Anh). Không có rule này, người đọc bấm
+# vào 1 trang /en/... chưa có bản dịch (vd /en/projects/, /en/about/ khi
+# content/projects, content/about chưa có index.en.adoc) sẽ thấy trang
+# 404 tiếng Việt — nhìn như site "tự rớt về tiếng Việt". Rule dưới trỏ mọi
+# path /en/* không khớp về đúng 404.html tiếng Anh.
+[[redirects]]
+  from = "/en/*"
+  to = "/en/404.html"
+  status = 404

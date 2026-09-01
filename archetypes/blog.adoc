@@ -1,0 +1,24 @@
+{{/*
+  Đặt tên archetypes/blog.adoc (không phải .md) — bắt buộc khớp đúng
+  extension với content thật (.adoc). Hugo lookup archetype theo cặp
+  section+extension của file đích; archetypes/blog.md (tên cũ) không bao
+  giờ được dùng cho `hugo new content/blog/.../*.adoc` — luôn fallback về
+  archetypes/default.md (thiếu tags/images/summary). Đã verify thực
+  nghiệm: hugo new .../flat.adoc và .../bundle/index.vi.adoc đều fallback
+  default khi archetype là .md, và dùng đúng archetypes/blog.adoc (đủ
+  field) sau khi đổi tên — không phụ thuộc bundle hay language suffix.
+
+  i18n convention: tạo bài mới bằng
+    hugo new content/blog/2026/<slug>/index.vi.adoc
+  Language suffix của filename không ảnh hưởng lookup archetype. Khi dịch
+  bài sang tiếng Anh, tạo tay index.en.adoc cùng thư mục bundle (dùng chung
+  ảnh với index.vi.adoc) — không tự sinh, không dịch tự động.
+*/}}
+---
+title: "{{ replace .File.ContentBaseName "-" " " | title }}"
+date: {{ .Date }}
+tags: []
+images: []
+summary: ""
+draft: true
+---

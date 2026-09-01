@@ -1,0 +1,10 @@
+---
+title: "Hoang Luong Tran"
+type: "home"
+---
+
+// Keep to 2-3 sentences so the hero layout holds. Can use link:...[] AsciiDoc
+// syntax for inline links (e.g. to /en/projects/).
+I'm a software engineer working on backends with Java and Spring. This blog is
+where I write down what I learn along the way — the patterns that hold up, the
+places I trip, and the reasoning behind a technical choice.
