@@ -1,11 +1,6 @@
 # hoangluongtran.dev
 
-<!--
-  Fill in the two placeholders below, then delete this comment:
-  <NETLIFY_SITE_ID>   Netlify UI → Site configuration → Site details → Site ID
-  <NETLIFY_SITE_NAME> the subdomain in your *.netlify.app URL
--->
-[![Netlify Status](https://api.netlify.com/api/v1/badges/<NETLIFY_SITE_ID>/deploy-status)](https://app.netlify.com/sites/<NETLIFY_SITE_NAME>/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/438ac737-e47b-4d20-9728-fbf7200be682/deploy-status)](https://app.netlify.com/projects/animated-jelly-01b57b/deploys)
 [![Hugo](https://img.shields.io/badge/Hugo-0.164.0%20extended-ff4088?logo=hugo)](https://gohugo.io/)
 [![AsciiDoc](https://img.shields.io/badge/content-AsciiDoc-4b8bbe)](https://asciidoc.org/)
 
