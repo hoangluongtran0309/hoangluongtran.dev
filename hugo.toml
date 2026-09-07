@@ -31,6 +31,21 @@ defaultContentLanguageInSubdir = false
     url = "/about"
     weight = 3
 
+  # Chỉ hiện ItemForge trên homepage tiếng Việt trong lần xuất bản đầu.
+  # `image` là URL của page resource đã được project page publish; partial
+  # featured-project hỗ trợ cả asset Hugo và URL nội bộ để không nhân đôi SVG.
+  [languages.vi.params.featuredProject]
+    title = "ItemForge"
+    description = "Custom item cho Paper Minecraft từ YAML, với resource pack tự sinh và kiến trúc hỗ trợ cả model legacy lẫn modern."
+    image = "/projects/itemforge/cover.svg"
+    imageAlt = "Minh họa ItemForge với một thanh kiếm pixel đang được rèn trên đe."
+    [languages.vi.params.featuredProject.ctaPrimary]
+      label = "Xem dự án"
+      url = "/projects/itemforge/"
+    [languages.vi.params.featuredProject.ctaSecondary]
+      label = "GitHub"
+      url = "https://github.com/hoangluongtran0309/item-forge"
+
 [languages.en]
   label = "English"
   title = "Hoang Luong Tran"
@@ -96,9 +111,11 @@ defaultContentLanguageInSubdir = false
     x = "https://x.com/luongtran0309"
 
   # Banner sản phẩm nổi bật (layouts/partials/featured-project.html) — khai
-  # bảng [params.featuredProject] (title/description/image/ctaPrimary/
-  # ctaSecondary) thì section hiện ở trang chủ; không khai thì ẩn hoàn toàn.
-  # Hiện chưa có project thật nên để trống.
+  # bảng [params.featuredProject] (title/description/image/imageAlt/
+  # ctaPrimary/ctaSecondary) thì section hiện ở trang chủ; không khai thì
+  # ẩn hoàn toàn. ItemForge hiện được khai riêng trong
+  # [languages.vi.params.featuredProject] để bản tiếng Anh không hiện nội
+  # dung tiếng Việt khi chưa có bản dịch.
 
 [taxonomies]
   tag = "tags"
