@@ -70,6 +70,18 @@ defaultContentLanguageInSubdir = false
     heroHeadline = "I build backends with _Java and Spring_."
     heroImageAlt = "Portrait photo of Hoang Luong Tran"
 
+    [languages.en.params.featuredProject]
+      title = "ItemForge"
+      description = "Custom items for Paper Minecraft from YAML, with automatic resource-pack generation and an architecture for both legacy and modern models."
+      image = "/en/projects/itemforge/cover.en.svg"
+      imageAlt = "ItemForge illustration showing a pixel sword being forged on an anvil."
+      [languages.en.params.featuredProject.ctaPrimary]
+        label = "View project"
+        url = "/en/projects/itemforge/"
+      [languages.en.params.featuredProject.ctaSecondary]
+        label = "GitHub"
+        url = "https://github.com/hoangluongtran0309/item-forge"
+
 [params]
   # KHÔNG khai `images` ở cấp site (bậc 3 trong fallback chain của
   # layouts/partials/opengraph/*.html: front matter `images` → social card
