@@ -11,10 +11,16 @@
 <article class="content">
   <h1>{{ .Title }}</h1>
   {{ with .Params.subtitle }}<p class="project-subtitle">{{ . }}</p>{{ end }}
-  {{ with .Params.images }}
-    {{ with $.Resources.Get (index . 0) }}
-      <img class="project-cover" src="{{ .RelPermalink }}" alt="" width="{{ .Width }}" height="{{ .Height }}">
-    {{ end }}
+  {{ $coverName := .Params.cover }}
+  {{ if not $coverName }}
+    {{ with .Params.images }}{{ $coverName = index . 0 }}{{ end }}
+  {{ end }}
+  {{ with .Resources.Get $coverName }}
+      {{ if eq .MediaType.SubType "svg" }}
+        <img class="project-cover" src="{{ .RelPermalink }}" alt="{{ $.Params.imageAlt | default "" }}">
+      {{ else }}
+        <img class="project-cover" src="{{ .RelPermalink }}" alt="{{ $.Params.imageAlt | default "" }}" width="{{ .Width }}" height="{{ .Height }}">
+      {{ end }}
   {{ end }}
   {{ if or .Params.ctaPrimary .Params.ctaSecondary }}
     <div class="featured-project__ctas">
