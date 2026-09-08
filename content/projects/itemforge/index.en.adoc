@@ -1,0 +1,35 @@
+---
+title: "ItemForge"
+subtitle: "An open-source custom item system for Paper Minecraft, configured in YAML with automatic resource-pack generation."
+cover: "cover.en.svg"
+imageAlt: "ItemForge illustration showing a pixel sword being forged on an anvil beside YAML, Java, and resource-pack blocks."
+ctaPrimary:
+  label: "View source"
+  url: "https://github.com/hoangluongtran0309/item-forge"
+ctaSecondary:
+  label: "Download v1.0.0"
+  url: "https://github.com/hoangluongtran0309/item-forge/releases/tag/v1.0.0"
+draft: false
+---
+
+ItemForge is a free, open-source plugin for Paper Minecraft. Instead of hand-writing every model file in a resource pack, a server administrator defines items, armor, crafting recipes, and blocks in YAML. The plugin validates that configuration, generates the resource pack, packages and hashes it, serves it to clients, and applies the gameplay logic at runtime.
+
+== Highlights
+
+* One configuration works on Paper 1.20.5 and later: ItemForge automatically selects the legacy `CustomModelData` system or the modern `item_model` system introduced in 1.21.4.
+* Custom items, armor, blocks, shaped and shapeless recipes, abilities, and per-player cooldowns.
+* Automatic resource-pack generation and built-in hosting, with no separate file host required.
+* A deterministic, rule-based balance analyzer that needs no API key; AI review and item generation are optional and disabled by default.
+* An optional Spring Boot web dashboard for managing content and editing textures visually.
+
+== Technology
+
+`Java 21` · `Paper API` · `Spring Boot` · `Thymeleaf` · `HTMX` · `Docker`
+
+The plugin follows a ports-and-adapters structure: the domain and application layers do not depend directly on YAML parsing, the Paper API, HTTP, or any AI provider. Differences between Minecraft versions sit behind separate strategies for items, armor, and blocks.
+
+== Current status
+
+ItemForge v1.0.0 provides the complete configuration, core gameplay, resource-pack, dashboard, and Docker deployment paths. The `ON_HIT`, `ON_KILL`, and `ON_CONSUME` triggers and the `DAMAGE_BONUS` effect exist in the data model but are not yet executed at runtime. Some custom-block world-state edge cases also lack an automated regression suite.
+
+Read link:/en/blog/2026/building-itemforge/[Building ItemForge: an open-source custom item system for Minecraft in Java] for a closer look at the architectural decisions and engineering lessons behind the project.

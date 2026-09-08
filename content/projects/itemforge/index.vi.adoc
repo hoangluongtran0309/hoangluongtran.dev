@@ -1,0 +1,35 @@
+---
+title: "ItemForge"
+subtitle: "Hệ thống custom item mã nguồn mở cho Paper Minecraft, cấu hình bằng YAML và tự động sinh resource pack."
+cover: "cover.svg"
+imageAlt: "Minh họa ItemForge với một thanh kiếm pixel đang được rèn trên đe, cạnh các khối YAML, Java và resource pack."
+ctaPrimary:
+  label: "Xem mã nguồn"
+  url: "https://github.com/hoangluongtran0309/item-forge"
+ctaSecondary:
+  label: "Tải v1.0.0"
+  url: "https://github.com/hoangluongtran0309/item-forge/releases/tag/v1.0.0"
+draft: false
+---
+
+ItemForge là plugin miễn phí, mã nguồn mở dành cho Paper Minecraft. Thay vì viết thủ công từng file model trong resource pack, quản trị viên chỉ cần định nghĩa item, giáp, công thức chế tạo và block trong YAML. Plugin sẽ kiểm tra cấu hình, tạo resource pack, đóng gói, tính SHA-1, host pack và áp dụng gameplay logic khi server chạy.
+
+== Điểm nổi bật
+
+* Một cấu hình chạy trên Paper 1.20.5 trở lên: ItemForge tự chọn cơ chế `CustomModelData` cũ hoặc `item_model` mới từ phiên bản 1.21.4.
+* Hỗ trợ custom item, armor, block, shaped/shapeless recipe, ability và cooldown.
+* Tự động sinh và phục vụ resource pack, không cần một dịch vụ lưu trữ file riêng.
+* Balance analyzer chạy bằng rule, không cần API key; phần đánh giá và sinh item bằng AI là tùy chọn và tắt mặc định.
+* Web dashboard Spring Boot đi kèm để quản lý nội dung và chỉnh texture trực quan.
+
+== Công nghệ
+
+`Java 21` · `Paper API` · `Spring Boot` · `Thymeleaf` · `HTMX` · `Docker`
+
+Phần plugin được tổ chức theo hướng ports and adapters: domain và application không phụ thuộc trực tiếp vào cách đọc YAML, Paper API, HTTP hay nhà cung cấp AI. Những khác biệt giữa các phiên bản Minecraft được đặt sau các Strategy riêng cho item, armor và block.
+
+== Trạng thái hiện tại
+
+ItemForge v1.0.0 đã hỗ trợ đầy đủ luồng cấu hình, gameplay cơ bản, resource pack, dashboard và triển khai bằng Docker. Một số trigger như `ON_HIT`, `ON_KILL`, `ON_CONSUME` và hiệu ứng `DAMAGE_BONUS` đã có trong data model nhưng chưa được thực thi ở runtime. Custom block cũng còn một số edge case chưa có regression test tự động.
+
+Đọc bài viết link:/blog/2026/building-itemforge/[Xây dựng ItemForge: hệ thống custom item mã nguồn mở cho Minecraft bằng Java] để xem kỹ hơn các quyết định kiến trúc và những bài học phía sau dự án.

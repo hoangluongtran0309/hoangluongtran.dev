@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">ItemForge resource-pack pipeline</title>
+  <desc id="desc">YAML and PNG files pass through loading, registries, a model strategy, staging, ZIP and SHA-1 generation, and an HTTP server before reaching the Minecraft client.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#09140e"/><stop offset="1" stop-color="#173323"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#79df9b"/></marker>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity=".28"/></filter>
+  </defs>
+  <rect width="1200" height="650" rx="24" fill="url(#bg)"/>
+  <text x="56" y="65" fill="#f0fff5" font-family="Liberation Sans, sans-serif" font-size="34" font-weight="700">From configuration to the Minecraft client</text>
+  <text x="56" y="103" fill="#aec2b4" font-family="Liberation Sans, sans-serif" font-size="20">One rebuild produces gameplay metadata and a hashed resource pack.</text>
+
+  <g filter="url(#glow)" font-family="Liberation Sans, sans-serif">
+    <g fill="#10271a" stroke="#3c8f5a" stroke-width="2">
+      <rect x="55" y="180" width="165" height="110" rx="14"/><rect x="55" y="355" width="165" height="110" rx="14"/>
+      <rect x="285" y="268" width="165" height="110" rx="14"/><rect x="515" y="268" width="165" height="110" rx="14"/>
+      <rect x="745" y="268" width="165" height="110" rx="14"/><rect x="980" y="268" width="165" height="110" rx="14"/>
+    </g>
+    <g fill="#edfff3" text-anchor="middle">
+      <text x="138" y="222" font-size="22" font-weight="700">YAML</text>
+      <text x="138" y="252" font-size="16">items · armor</text><text x="138" y="274" font-size="16">blocks · recipes</text>
+      <text x="138" y="397" font-size="22" font-weight="700">PNG</text>
+      <text x="138" y="427" font-size="16">item · armor</text><text x="138" y="449" font-size="16">block textures</text>
+
+      <text x="368" y="310" font-size="21" font-weight="700">Load + validate</text>
+      <text x="368" y="340" font-size="16">domain definitions</text><text x="368" y="362" font-size="16">registries</text>
+
+      <text x="598" y="310" font-size="21" font-weight="700">Model Strategy</text>
+      <text x="598" y="340" font-size="16">legacy or modern</text><text x="598" y="362" font-size="16">from server version</text>
+
+      <text x="828" y="310" font-size="21" font-weight="700">Build pack</text>
+      <text x="828" y="340" font-size="16">staging → ZIP</text><text x="828" y="362" font-size="16">+ SHA-1</text>
+
+      <text x="1063" y="310" font-size="21" font-weight="700">Deliver</text>
+      <text x="1063" y="340" font-size="16">HTTP server</text><text x="1063" y="362" font-size="16">→ Minecraft client</text>
+    </g>
+  </g>
+
+  <g fill="none" stroke="#79df9b" stroke-width="4" marker-end="url(#arrow)">
+    <path d="M220 235 285 298"/><path d="M220 410 285 348"/><path d="M450 323H515"/>
+    <path d="M680 323H745"/><path d="M910 323H980"/>
+  </g>
+
+  <g font-family="Liberation Mono, monospace" font-size="16">
+    <rect x="515" y="445" width="395" height="82" rx="12" fill="#0b1c12" stroke="#326f49"/>
+    <text x="540" y="477" fill="#aeeec3">Failure-safe:</text>
+    <text x="540" y="505" fill="#d7f7e1">placeholder texture · retain last good pack</text>
+    <path d="M713 445V392" fill="none" stroke="#4da96e" stroke-width="2" stroke-dasharray="7 7"/>
+  </g>
+</svg>

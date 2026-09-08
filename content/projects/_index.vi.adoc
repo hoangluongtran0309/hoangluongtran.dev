@@ -6,6 +6,4 @@ draft: false
 
 = Projects
 
-Danh sách các project cá nhân sẽ được cập nhật tại đây.
-
-_(Trang này đang được xây dựng — nội dung project thực tế sẽ được bổ sung sau.)_
+Những sản phẩm mình xây dựng để giải quyết các bài toán thực tế, thử nghiệm ý tưởng kiến trúc và chia sẻ lại dưới dạng mã nguồn mở.

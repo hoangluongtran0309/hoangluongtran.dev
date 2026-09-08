@@ -1,14 +1,17 @@
 {{/*
   Banner sản phẩm nổi bật — nhận dict qua `with .Site.Params.featuredProject`
   ở layouts/index.html. Field: title, description, image (path trong
-  assets/images/, xử lý qua resources.Get), ctaPrimary.{label,url},
+  assets/images/ hoặc URL nội bộ), imageAlt, ctaPrimary.{label,url},
   ctaSecondary.{label,url} (optional). Không render gì nếu .Site.Params.featuredProject
   chưa được set — caller đã bọc bằng `with`.
 */}}
 <section class="featured-project">
   {{ with .image }}
-    {{ with resources.Get . }}
-      <img class="featured-project__image" src="{{ .RelPermalink }}" alt="">
+    {{ $imagePath := . }}
+    {{ with resources.Get $imagePath }}
+      <img class="featured-project__image" src="{{ .RelPermalink }}" alt="{{ $.imageAlt | default "" }}">
+    {{ else }}
+      <img class="featured-project__image" src="{{ $imagePath }}" alt="{{ $.imageAlt | default "" }}">
     {{ end }}
   {{ end }}
   <div class="featured-project__body">

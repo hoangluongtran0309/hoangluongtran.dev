@@ -28,11 +28,17 @@
             {{ $project := . }}
             <li class="projects-grid__card">
               <a href="{{ .RelPermalink }}">
-                {{ with .Params.images }}
-                  {{ with $project.Resources.Get (index . 0) }}
-                    {{ $cover := .Resize "480x270 q80" }}
-                    <img class="projects-grid__cover" src="{{ $cover.RelPermalink }}" alt="">
-                  {{ end }}
+                {{ $coverName := .Params.cover }}
+                {{ if not $coverName }}
+                  {{ with .Params.images }}{{ $coverName = index . 0 }}{{ end }}
+                {{ end }}
+                {{ with $project.Resources.Get $coverName }}
+                    {{ if eq .MediaType.SubType "svg" }}
+                      <img class="projects-grid__cover" src="{{ .RelPermalink }}" alt="">
+                    {{ else }}
+                      {{ $cover := .Resize "480x270 q80" }}
+                      <img class="projects-grid__cover" src="{{ $cover.RelPermalink }}" alt="">
+                    {{ end }}
                 {{ end }}
                 <div class="projects-grid__body">
                   {{ with .Params.icon }}<img class="projects-grid__icon" src="{{ . }}" alt="">{{ end }}
