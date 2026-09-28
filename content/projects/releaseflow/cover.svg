@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">ReleaseFlow</title>
+  <desc id="desc">Các pull request đã merge đi qua bước phân loại, người duyệt và trở thành một release note đã được khóa.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c0f1f"/>
+      <stop offset="1" stop-color="#1e1b3d"/>
+    </linearGradient>
+    <linearGradient id="note" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5f3ff"/>
+      <stop offset="1" stop-color="#ddd6fe"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#a5b4fc" stroke-opacity=".055" stroke-width="2"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#a5b4fc"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" rx="24" fill="url(#background)"/>
+  <rect width="1200" height="675" rx="24" fill="url(#grid)"/>
+  <path d="M0 560 260 470l300 60 280-120 360 90v195H0Z" fill="#111430" opacity=".9"/>
+
+  <g transform="translate(74 84)">
+    <text x="0" y="70" fill="#a5b4fc" font-family="Liberation Mono, monospace" font-size="27" letter-spacing="5">JAVA 21 · SPRING BOOT</text>
+    <text x="0" y="156" fill="#f5f3ff" font-family="Liberation Sans, sans-serif" font-size="78" font-weight="700">ReleaseFlow</text>
+    <text x="2" y="211" fill="#c4c2dc" font-family="Liberation Sans, sans-serif" font-size="28">PR đã merge vào. Release note đã duyệt ra.</text>
+  </g>
+
+  <!-- Merged changes -->
+  <g transform="translate(90 360)" font-family="Liberation Mono, monospace" font-size="20">
+    <rect width="250" height="56" rx="10" fill="#171a3a" stroke="#6366f1"/>
+    <text x="22" y="36" fill="#e0e7ff">feat: #128</text>
+    <rect y="72" width="250" height="56" rx="10" fill="#171a3a" stroke="#6366f1"/>
+    <text x="22" y="108" fill="#e0e7ff">fix: #131</text>
+    <rect y="144" width="250" height="56" rx="10" fill="#171a3a" stroke="#f59e0b"/>
+    <text x="22" y="180" fill="#fde68a">chore!: #134</text>
+  </g>
+
+  <path d="M360 460h110" stroke="#a5b4fc" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- Classification + human review -->
+  <g transform="translate(488 372)" font-family="Liberation Sans, sans-serif">
+    <rect width="230" height="176" rx="18" fill="#1b1f47" stroke="#818cf8" stroke-width="3"/>
+    <text x="115" y="44" fill="#e0e7ff" font-size="22" font-weight="700" text-anchor="middle">Rules → AI</text>
+    <circle cx="115" cy="104" r="34" fill="#312e81" stroke="#c7d2fe" stroke-width="3"/>
+    <circle cx="115" cy="94" r="11" fill="#c7d2fe"/>
+    <path d="M95 124c4-14 36-14 40 0" fill="#c7d2fe"/>
+    <text x="115" y="160" fill="#c4c2dc" font-size="19" text-anchor="middle">người duyệt quyết định</text>
+  </g>
+
+  <path d="M735 460h110" stroke="#a5b4fc" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- Frozen release note -->
+  <g transform="translate(862 250)" filter="url(#glow)">
+    <rect width="250" height="310" rx="16" fill="url(#note)" stroke="#c4b5fd" stroke-width="4"/>
+    <text x="28" y="54" fill="#1e1b4b" font-family="Liberation Sans, sans-serif" font-size="26" font-weight="700">v0.1.0</text>
+    <rect x="28" y="82" width="120" height="12" rx="6" fill="#7c3aed"/>
+    <rect x="28" y="112" width="194" height="10" rx="5" fill="#a78bfa"/>
+    <rect x="28" y="136" width="170" height="10" rx="5" fill="#a78bfa"/>
+    <rect x="28" y="172" width="100" height="12" rx="6" fill="#7c3aed"/>
+    <rect x="28" y="202" width="184" height="10" rx="5" fill="#a78bfa"/>
+    <rect x="28" y="226" width="150" height="10" rx="5" fill="#a78bfa"/>
+    <g transform="translate(176 244)">
+      <rect x="4" y="22" width="44" height="36" rx="6" fill="#f59e0b" stroke="#fde68a" stroke-width="3"/>
+      <path d="M14 22v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#fde68a" stroke-width="5"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,41 @@
+---
+title: "ReleaseFlow"
+subtitle: "Ứng dụng mã nguồn mở biến pull request đã merge thành release note có người duyệt và không thể sửa sau khi xuất bản."
+cover: "cover.svg"
+imageAlt: "Minh họa ReleaseFlow: các pull request đi qua bước phân loại và người duyệt, rồi trở thành một release note đã khóa."
+weight: 1
+ctaPrimary:
+  label: "Xem mã nguồn"
+  url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator"
+ctaSecondary:
+  label: "Xem v0.1.0"
+  url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/tag/v0.1.0"
+draft: false
+---
+
+ReleaseFlow là ứng dụng web mã nguồn mở (Apache-2.0) giúp một team viết release note từ chính những thay đổi đã merge. Pull request trên GitHub, merge request trên GitLab, issue hoàn thành trên Linear và Jira được ghi nhận thành change, phân loại bằng rule có thể giải thích, được AI bổ sung tóm tắt nếu bạn bật, rồi đi qua một vòng review trước khi trở thành release note. Sau khi xuất bản, note bị khóa ở cả tầng ứng dụng lẫn database.
+
+== Điểm nổi bật
+
+* Bốn nguồn thay đổi: webhook có chữ ký cho GitHub, GitLab, Linear và polling cho Jira Cloud, kèm import lịch sử 90 ngày cho GitHub và GitLab.
+* Phân loại theo rule trước, AI sau: OpenAI, Anthropic hoặc DeepSeek chỉ được gọi một lần cho mỗi change, và không bao giờ được xóa cờ breaking mà rule đã đặt.
+* Vòng đời release `DRAFT → IN_REVIEW → APPROVED → PUBLISHED`, mỗi change cần một quyết định của người duyệt.
+* Một note riêng cho từng audience (operator, contributor, end user) bằng template Mustache, tối đa năm ngôn ngữ qua DeepL.
+* Automation giao note đã xuất bản tới GitHub Release, Slack, email, Notion, Confluence, Microsoft Teams, Zendesk và changelog công khai có RSS.
+* Multi-tenant trên một schema PostgreSQL, secret mã hóa AES-256-GCM, metrics Prometheus không bao giờ mang thông tin tenant.
+
+== Công nghệ
+
+`Java 21` · `Spring Boot 4` · `PostgreSQL` · `Flyway` · `Thymeleaf` · `Tailwind CSS` · `Alpine.js` · `Docker` · `Prometheus` · `Grafana`
+
+ReleaseFlow là một modular monolith: một Maven module, một file JAR, nhưng code được chia theo năng lực sản phẩm (`change`, `release`, `audience`, `automation`...). Công việc chạy nền dùng các bảng hàng đợi trong PostgreSQL với `FOR UPDATE SKIP LOCKED`, nên nhiều instance có thể chạy cùng lúc mà không cần message broker hay leader election.
+
+== Trạng thái hiện tại
+
+Phiên bản v0.1.0 được phát hành ngày 23/09/2026, gồm toàn bộ các lát cắt trong kế hoạch ban đầu và 30 ADR ghi lại các quyết định kiến trúc. Một số phần được cố ý để lại: đổi vai trò hoặc xóa thành viên, xoay vòng secret và token, phân trang và tìm kiếm trong Change Inbox, cũng như sửa hoặc gỡ một release note đã xuất bản. Docker Compose đi kèm là môi trường demo, chưa phải cấu hình production.
+
+== Series bài viết
+
+. link:/blog/2026/building-releaseflow/[Xây dựng ReleaseFlow: từ pull request đã merge đến release note] — bài toán, kiến trúc modular monolith và hàng đợi bền vững trong PostgreSQL.
+. link:/blog/2026/releaseflow-ai-human-review/[AI đề xuất, con người quyết định] — rule trước AI, vòng đời review và release note bất biến.
+. link:/blog/2026/releaseflow-security-multi-tenant/[Bảo mật một ứng dụng multi-tenant nhận webhook từ người lạ] — tenant isolation, webhook có chữ ký, mã hóa secret và observability.

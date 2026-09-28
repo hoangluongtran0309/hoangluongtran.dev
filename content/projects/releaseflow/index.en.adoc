@@ -1,0 +1,41 @@
+---
+title: "ReleaseFlow"
+subtitle: "An open-source application that turns merged pull requests into human-reviewed release notes that cannot change once published."
+cover: "cover.en.svg"
+imageAlt: "ReleaseFlow illustration: pull requests pass through classification and a human reviewer, then become a locked release note."
+weight: 1
+ctaPrimary:
+  label: "View source"
+  url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator"
+ctaSecondary:
+  label: "See v0.1.0"
+  url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/tag/v0.1.0"
+draft: false
+---
+
+ReleaseFlow is an open-source web application (Apache-2.0) that helps a team write release notes from the changes it has actually merged. GitHub pull requests, GitLab merge requests, and completed Linear and Jira issues are recorded as changes, classified by explainable rules, summarised by AI if you enable it, and taken through a review before they become release notes. Once published, a note is locked in both the application and the database.
+
+== Highlights
+
+* Four change sources: signed webhooks for GitHub, GitLab, and Linear, polling for Jira Cloud, and a 90-day history import for GitHub and GitLab.
+* Rules first, AI second: OpenAI, Anthropic, or DeepSeek is asked exactly once per change, and can never clear a breaking flag the rules set.
+* A `DRAFT → IN_REVIEW → APPROVED → PUBLISHED` release lifecycle in which every change needs a reviewer's decision.
+* A separate note for each audience (operator, contributor, end user) through Mustache templates, in up to five languages via DeepL.
+* Automation that delivers a published note to GitHub Releases, Slack, email, Notion, Confluence, Microsoft Teams, Zendesk, and a public changelog with RSS.
+* Multi-tenant on one PostgreSQL schema, secrets encrypted with AES-256-GCM, and Prometheus metrics that never carry tenant information.
+
+== Technology
+
+`Java 21` · `Spring Boot 4` · `PostgreSQL` · `Flyway` · `Thymeleaf` · `Tailwind CSS` · `Alpine.js` · `Docker` · `Prometheus` · `Grafana`
+
+ReleaseFlow is a modular monolith: one Maven module and one JAR, with code packaged by product capability (`change`, `release`, `audience`, `automation`...). Background work runs from queue tables in PostgreSQL claimed with `FOR UPDATE SKIP LOCKED`, so several instances can run side by side without a message broker or leader election.
+
+== Current status
+
+v0.1.0 was released on 23 September 2026. It contains every slice of the original plan and 30 ADRs recording the architectural decisions. Some things are deliberately left out: changing roles or removing members, rotating secrets and tokens, paging and search in the Change Inbox, and correcting or withdrawing a published release note. The bundled Docker Compose stack is a demo environment, not a production configuration.
+
+== Article series
+
+. link:/en/blog/2026/building-releaseflow/[Building ReleaseFlow: from merged pull requests to release notes] — the problem, the modular-monolith architecture, and durable queues in PostgreSQL.
+. link:/en/blog/2026/releaseflow-ai-human-review/[AI suggests, people decide] — rules before AI, the review lifecycle, and immutable release notes.
+. link:/en/blog/2026/releaseflow-security-multi-tenant/[Securing a multi-tenant app that takes webhooks from strangers] — tenant isolation, signed webhooks, secret encryption, and observability.
