@@ -26,12 +26,29 @@
 {{- $img := resources.Get "images/twittercard/template.png" -}}
 
 {{- if and $img $fontTitle $fontBody -}}
+  {{- /*
+    images.Text tự xuống dòng nhưng không co chữ, nên tiêu đề dài ở cỡ 64
+    tràn xuống vùng avatar (y >= 290). Chọn cỡ chữ + điểm bắt đầu theo số
+    ký tự để khối tiêu đề luôn kết thúc trước y ~ 285 và dưới dòng tags
+    (kết thúc ~ y 105). Mốc ký tự ước lượng theo độ rộng trung bình của
+    LiberationSerif-Bold trên dải x:[80,1150].
+  */ -}}
+  {{- $titleLength := strings.RuneCount .LinkTitle -}}
+  {{- $titleSize := 64 -}}
+  {{- $titleY := 190 -}}
+  {{- if gt $titleLength 110 -}}
+    {{- $titleSize = 38 -}}{{- $titleY = 125 -}}
+  {{- else if gt $titleLength 60 -}}
+    {{- $titleSize = 46 -}}{{- $titleY = 130 -}}
+  {{- else if gt $titleLength 30 -}}
+    {{- $titleSize = 56 -}}{{- $titleY = 150 -}}
+  {{- end -}}
   {{- $img = $img.Filter (images.Text .LinkTitle (dict
         "color" "#ffffff"
-        "size" 64
+        "size" $titleSize
         "linespacing" 6
         "x" 80
-        "y" 190
+        "y" $titleY
         "font" $fontTitle
       )) -}}
 
