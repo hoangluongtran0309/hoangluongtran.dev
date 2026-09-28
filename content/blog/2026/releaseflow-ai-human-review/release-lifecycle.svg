@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Vòng đời một release trong ReleaseFlow</title>
+  <desc id="desc">Release đi từ DRAFT sang IN_REVIEW, APPROVED rồi PUBLISHED. Mỗi change cần quyết định APPROVE hoặc EDIT. Lúc duyệt, mỗi audience và ngôn ngữ nhận một note. Sau khi xuất bản, trigger PostgreSQL chặn mọi thay đổi.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c0f1f"/><stop offset="1" stop-color="#1b1a3a"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity=".3"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#a5b4fc"/>
+    </marker>
+    <marker id="back" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#fbbf24"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="720" rx="24" fill="url(#bg)"/>
+  <text x="60" y="68" fill="#f5f3ff" font-family="Liberation Sans, sans-serif" font-size="34" font-weight="700">Release: bốn trạng thái, một chiều khóa</text>
+  <text x="60" y="105" fill="#c4c2dc" font-family="Liberation Sans, sans-serif" font-size="20">Service kiểm tra trước; trigger PostgreSQL chặn lần thứ hai.</text>
+
+  <g font-family="Liberation Sans, sans-serif" filter="url(#shadow)" text-anchor="middle">
+    <rect x="60" y="210" width="220" height="120" rx="20" fill="#1e2250" stroke="#a5b4fc" stroke-width="3"/>
+    <text x="170" y="262" fill="#f5f3ff" font-size="28" font-weight="700" font-family="Liberation Mono, monospace">DRAFT</text>
+    <text x="170" y="296" fill="#c7d2fe" font-size="17">chọn change</text>
+
+    <rect x="345" y="210" width="220" height="120" rx="20" fill="#1e2250" stroke="#a5b4fc" stroke-width="3"/>
+    <text x="455" y="262" fill="#f5f3ff" font-size="26" font-weight="700" font-family="Liberation Mono, monospace">IN_REVIEW</text>
+    <text x="455" y="296" fill="#c7d2fe" font-size="17">APPROVE · EDIT · loại</text>
+
+    <rect x="630" y="210" width="220" height="120" rx="20" fill="#3b2a7a" stroke="#c4b5fd" stroke-width="3"/>
+    <text x="740" y="262" fill="#f5f3ff" font-size="28" font-weight="700" font-family="Liberation Mono, monospace">APPROVED</text>
+    <text x="740" y="296" fill="#ddd6fe" font-size="17">note được ghi</text>
+
+    <rect x="915" y="210" width="225" height="120" rx="20" fill="#f5f3ff" stroke="#fbbf24" stroke-width="4"/>
+    <text x="1027" y="262" fill="#1e1b4b" font-size="26" font-weight="700" font-family="Liberation Mono, monospace">PUBLISHED</text>
+    <text x="1027" y="296" fill="#5b21b6" font-size="17">bất biến</text>
+  </g>
+
+  <g stroke="#a5b4fc" stroke-width="4" fill="none">
+    <path d="M280 270h58" marker-end="url(#arrow)"/>
+    <path d="M565 270h58" marker-end="url(#arrow)"/>
+    <path d="M850 270h58" marker-end="url(#arrow)"/>
+  </g>
+  <g stroke="#fbbf24" stroke-width="3" fill="none" stroke-dasharray="8 6">
+    <path d="M455 210q0-50-285-50 0 0 0 44" marker-end="url(#back)"/>
+    <path d="M740 210q0-72-570-72v68" marker-end="url(#back)"/>
+  </g>
+  <text x="600" y="130" fill="#fbbf24" font-family="Liberation Sans, sans-serif" font-size="16" text-anchor="middle">trả về draft: xóa quyết định và note</text>
+
+  <!-- Notes fan-out -->
+  <g font-family="Liberation Sans, sans-serif">
+    <path d="M740 330v60" stroke="#c4b5fd" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="470" y="400" width="540" height="200" rx="20" fill="#161a3f" stroke="#6366f1" stroke-width="2"/>
+    <text x="740" y="438" fill="#a5b4fc" font-size="17" font-weight="700" letter-spacing="2" text-anchor="middle">MỘT NOTE / AUDIENCE / NGÔN NGỮ</text>
+    <g font-size="17" fill="#e0e7ff" text-anchor="middle" font-family="Liberation Mono, monospace">
+      <rect x="495" y="460" width="155" height="52" rx="10" fill="#28307a"/><text x="572" y="492">operator·vi</text>
+      <rect x="662" y="460" width="155" height="52" rx="10" fill="#28307a"/><text x="739" y="492">contributor·vi</text>
+      <rect x="829" y="460" width="155" height="52" rx="10" fill="#28307a"/><text x="906" y="492">end_user·vi</text>
+      <rect x="495" y="524" width="155" height="52" rx="10" fill="#28307a"/><text x="572" y="556">operator·en</text>
+      <rect x="662" y="524" width="155" height="52" rx="10" fill="#28307a"/><text x="739" y="556">contributor·en</text>
+      <rect x="829" y="524" width="155" height="52" rx="10" fill="#28307a"/><text x="906" y="556">end_user·en</text>
+    </g>
+
+    <rect x="60" y="400" width="370" height="200" rx="20" fill="#161a3f" stroke="#6366f1" stroke-width="2"/>
+    <text x="85" y="438" fill="#a5b4fc" font-size="17" font-weight="700" letter-spacing="2">MỖI CHANGE, TRƯỚC ĐÓ</text>
+    <g font-size="18" fill="#e0e7ff">
+      <text x="85" y="478">1. Rule phân loại — luôn thắng</text>
+      <text x="85" y="512">2. AI: một request, JSON cố định</text>
+      <text x="85" y="546">3. Trigger buộc người duyệt</text>
+      <text x="85" y="580">4. DeepL dịch nội dung, không dịch note</text>
+    </g>
+  </g>
+
+  <text x="60" y="660" fill="#c4c2dc" font-family="Liberation Sans, sans-serif" font-size="18">Xuất bản chỉ được phép khi mọi note đã READY; sau đó UPDATE hoặc DELETE đều bị trigger từ chối.</text>
+</svg>
