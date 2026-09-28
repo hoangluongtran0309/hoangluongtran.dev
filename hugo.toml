@@ -31,20 +31,19 @@ defaultContentLanguageInSubdir = false
     url = "/about"
     weight = 3
 
-  # Chỉ hiện ItemForge trên homepage tiếng Việt trong lần xuất bản đầu.
   # `image` là URL của page resource đã được project page publish; partial
   # featured-project hỗ trợ cả asset Hugo và URL nội bộ để không nhân đôi SVG.
   [languages.vi.params.featuredProject]
-    title = "ItemForge"
-    description = "Custom item cho Paper Minecraft từ YAML, với resource pack tự sinh và kiến trúc hỗ trợ cả model legacy lẫn modern."
-    image = "/projects/itemforge/cover.svg"
-    imageAlt = "Minh họa ItemForge với một thanh kiếm pixel đang được rèn trên đe."
+    title = "ReleaseFlow"
+    description = "Biến pull request đã merge thành release note có người duyệt: rule trước AI sau, một note cho mỗi audience, và bất biến sau khi xuất bản."
+    image = "/projects/releaseflow/cover.svg"
+    imageAlt = "Minh họa ReleaseFlow: các pull request đi qua người duyệt và trở thành một release note đã khóa."
     [languages.vi.params.featuredProject.ctaPrimary]
       label = "Xem dự án"
-      url = "/projects/itemforge/"
+      url = "/projects/releaseflow/"
     [languages.vi.params.featuredProject.ctaSecondary]
       label = "GitHub"
-      url = "https://github.com/hoangluongtran0309/item-forge"
+      url = "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator"
 
 [languages.en]
   label = "English"
@@ -71,16 +70,16 @@ defaultContentLanguageInSubdir = false
     heroImageAlt = "Portrait photo of Hoang Luong Tran"
 
     [languages.en.params.featuredProject]
-      title = "ItemForge"
-      description = "Custom items for Paper Minecraft from YAML, with automatic resource-pack generation and an architecture for both legacy and modern models."
-      image = "/en/projects/itemforge/cover.en.svg"
-      imageAlt = "ItemForge illustration showing a pixel sword being forged on an anvil."
+      title = "ReleaseFlow"
+      description = "Turn merged pull requests into human-reviewed release notes: rules before AI, one note per audience, and immutable once published."
+      image = "/en/projects/releaseflow/cover.en.svg"
+      imageAlt = "ReleaseFlow illustration: pull requests pass a human reviewer and become a locked release note."
       [languages.en.params.featuredProject.ctaPrimary]
         label = "View project"
-        url = "/en/projects/itemforge/"
+        url = "/en/projects/releaseflow/"
       [languages.en.params.featuredProject.ctaSecondary]
         label = "GitHub"
-        url = "https://github.com/hoangluongtran0309/item-forge"
+        url = "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator"
 
 [params]
   # KHÔNG khai `images` ở cấp site (bậc 3 trong fallback chain của
@@ -125,9 +124,10 @@ defaultContentLanguageInSubdir = false
   # Banner sản phẩm nổi bật (layouts/partials/featured-project.html) — khai
   # bảng [params.featuredProject] (title/description/image/imageAlt/
   # ctaPrimary/ctaSecondary) thì section hiện ở trang chủ; không khai thì
-  # ẩn hoàn toàn. ItemForge hiện được khai riêng trong
-  # [languages.vi.params.featuredProject] để bản tiếng Anh không hiện nội
-  # dung tiếng Việt khi chưa có bản dịch.
+  # ẩn hoàn toàn. Dự án nổi bật (hiện là ReleaseFlow) được khai riêng trong
+  # [languages.vi.params.featuredProject] và
+  # [languages.en.params.featuredProject] để mỗi ngôn ngữ trỏ đúng trang
+  # project và ảnh bìa đã dịch của nó.
 
 [taxonomies]
   tag = "tags"
