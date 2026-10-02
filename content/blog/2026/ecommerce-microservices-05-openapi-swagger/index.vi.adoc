@@ -4,7 +4,7 @@ date: 2026-10-02T09:40:00+07:00
 tags: ["Java", "Spring Boot", "OpenAPI", "Microservices"]
 images: []
 summary: "Thêm springdoc-openapi cho product-composite: mô tả API ngay trong interface của module api, tách nội dung tài liệu ra file cấu hình, và thử API trực tiếp trên Swagger UI. Khép lại phần nền móng của series."
-draft: true
+draft: false
 ---
 
 [NOTE]

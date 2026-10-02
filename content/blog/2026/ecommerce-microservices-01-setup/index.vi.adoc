@@ -4,7 +4,7 @@ date: 2026-10-02T09:00:00+07:00
 tags: ["Java", "Spring Boot", "Spring Cloud", "Microservices", "Gradle"]
 images: []
 summary: "Mở đầu series xây một nền tảng thương mại điện tử theo kiến trúc microservices với Spring Boot 3 và Spring Cloud: vì sao chọn microservices, hệ thống trông thế nào, và dựng khung Gradle multi-project với hai module dùng chung."
-draft: true
+draft: false
 ---
 
 [NOTE]

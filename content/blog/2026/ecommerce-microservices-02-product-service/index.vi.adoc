@@ -4,7 +4,7 @@ date: 2026-10-02T09:10:00+07:00
 tags: ["Java", "Spring Boot", "WebFlux", "Microservices", "Testing"]
 images: []
 summary: "Tạo product-service: controller viết từ interface dùng chung, Mono của Project Reactor, xử lý lỗi toàn cục, chạy thử bằng curl và kiểm thử với WebTestClient."
-draft: true
+draft: false
 ---
 
 [NOTE]

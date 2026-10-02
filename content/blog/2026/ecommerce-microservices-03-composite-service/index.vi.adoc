@@ -4,7 +4,7 @@ date: 2026-10-02T09:20:00+07:00
 tags: ["Java", "Spring Boot", "WebFlux", "Microservices", "Testing"]
 images: []
 summary: "Thêm review-service, recommendation-service và product-composite-service: gọi ba service song song bằng WebClient và Mono.zip, chuyển lỗi HTTP thành exception, và giữ trang sản phẩm sống khi service phụ sập."
-draft: true
+draft: false
 ---
 
 [NOTE]

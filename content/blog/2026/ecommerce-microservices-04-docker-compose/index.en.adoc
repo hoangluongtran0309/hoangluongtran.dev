@@ -4,7 +4,7 @@ date: 2026-10-02T09:30:00+07:00
 tags: ["Java", "Spring Boot", "Docker", "Microservices", "Testing"]
 images: []
 summary: "Packaging four microservices as layered Docker images, understanding how the JVM sees a container's CPU and memory, running the whole system with Docker Compose, and testing it end to end with a bash script."
-draft: true
+draft: false
 ---
 
 [NOTE]

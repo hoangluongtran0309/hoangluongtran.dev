@@ -4,7 +4,7 @@ date: 2026-10-02T09:10:00+07:00
 tags: ["Java", "Spring Boot", "WebFlux", "Microservices", "Testing"]
 images: []
 summary: "Building product-service: a controller written from a shared interface, Project Reactor's Mono, global error handling, trying it with curl and testing it with WebTestClient."
-draft: true
+draft: false
 ---
 
 [NOTE]

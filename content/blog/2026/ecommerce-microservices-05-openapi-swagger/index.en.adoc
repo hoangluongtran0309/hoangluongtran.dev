@@ -4,7 +4,7 @@ date: 2026-10-02T09:40:00+07:00
 tags: ["Java", "Spring Boot", "OpenAPI", "Microservices"]
 images: []
 summary: "Adding springdoc-openapi to product-composite: documenting the API right in the interfaces of the api module, moving the documentation text into configuration, and trying the API from Swagger UI. This wraps up the foundations part of the series."
-draft: true
+draft: false
 ---
 
 [NOTE]

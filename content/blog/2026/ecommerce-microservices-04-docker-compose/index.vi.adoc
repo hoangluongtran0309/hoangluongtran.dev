@@ -4,7 +4,7 @@ date: 2026-10-02T09:30:00+07:00
 tags: ["Java", "Spring Boot", "Docker", "Microservices", "Testing"]
 images: []
 summary: "Đóng gói bốn microservice thành Docker image theo layer, hiểu JVM nhìn thấy CPU và RAM của container ra sao, chạy cả hệ thống bằng Docker Compose và kiểm tra end-to-end bằng một script bash."
-draft: true
+draft: false
 ---
 
 [NOTE]

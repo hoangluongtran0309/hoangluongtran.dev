@@ -4,7 +4,7 @@ date: 2026-10-02T09:20:00+07:00
 tags: ["Java", "Spring Boot", "WebFlux", "Microservices", "Testing"]
 images: []
 summary: "Adding review-service, recommendation-service and product-composite-service: calling three services in parallel with WebClient and Mono.zip, turning HTTP errors back into exceptions, and keeping the product page alive when a secondary service is down."
-draft: true
+draft: false
 ---
 
 [NOTE]

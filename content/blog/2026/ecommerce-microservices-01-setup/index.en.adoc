@@ -4,7 +4,7 @@ date: 2026-10-02T09:00:00+07:00
 tags: ["Java", "Spring Boot", "Spring Cloud", "Microservices", "Gradle"]
 images: []
 summary: "The start of a series on building an e-commerce platform as microservices with Spring Boot 3 and Spring Cloud: why microservices, what the system looks like, and a Gradle multi-project skeleton with two shared modules."
-draft: true
+draft: false
 ---
 
 [NOTE]
