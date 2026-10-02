@@ -1,0 +1,322 @@
+---
+title: "E-commerce microservices #4: packaging with Docker, running everything with Docker Compose"
+date: 2026-10-02T09:30:00+07:00
+tags: ["Java", "Spring Boot", "Docker", "Microservices", "Testing"]
+images: []
+summary: "Packaging four microservices as layered Docker images, understanding how the JVM sees a container's CPU and memory, running the whole system with Docker Compose, and testing it end to end with a bash script."
+draft: true
+---
+
+[NOTE]
+====
+This is *part 4* of the e-commerce microservices series. The code for this post is at tag `blog-04`. Previous post: link:/en/blog/2026/ecommerce-microservices-03-composite-service/[review, recommendation and the product page aggregator].
+====
+
+At the end of the previous post we needed four terminals to run four Java processes. With ten services, plus MongoDB, MySQL and Kafka in later posts, that does not go far. This post moves everything into Docker:
+
+* Every service becomes a Docker image that rebuilds quickly thanks to layers.
+* We see how the JVM sizes its heap inside a memory-limited container.
+* `docker compose up` starts the whole system, and only the composite is reachable from outside.
+* A `test-em-all.bash` script tests the whole system end to end, and can be rerun any time.
+
+== The JVM in a container: test before you trust
+
+Before writing a Dockerfile, the book runs an experiment worth repeating: does the JVM respect the container's CPU and memory limits? In the early Java 8 days it did not; the JVM saw the host's full memory and could get the container killed for exceeding its limit. Since Java 10 it does.
+
+Limit the container to 2 CPUs:
+
+[source,bash]
+----
+$ echo 'Runtime.getRuntime().availableProcessors()' | docker run --rm -i --cpus=2 eclipse-temurin:21 jshell -q
+jshell> $1 ==> 2
+----
+
+Limit it to 512 MB of memory and ask the JVM for its maximum heap:
+
+[source,bash]
+----
+$ docker run --rm -m=512m eclipse-temurin:21-jre java -XX:+PrintFlagsFinal -version | grep ' MaxHeapSize '
+   size_t MaxHeapSize = 134217728   {product} {ergonomic}
+----
+
+134217728 bytes is exactly 128 MB, *one quarter* of the container's memory. That is the JVM default when `-Xmx` is not set. Try allocating 200 MB in a 512 MB container:
+
+[source,bash]
+----
+$ echo 'new byte[200_000_000]' | docker run --rm -i -m=512m eclipse-temurin:21 jshell -q
+|  Exception java.lang.OutOfMemoryError: Java heap space
+----
+
+The container has more than 300 MB left, yet the JVM runs out of heap because it capped itself at 128 MB. That is enough for our small services. When a service needs more, instead of hard-coding `-Xmx` I will use `-XX:MaxRAMPercentage=75`, so the heap always scales with the container's memory:
+
+[source,bash]
+----
+$ docker run --rm -m=512m eclipse-temurin:21-jre java -XX:MaxRAMPercentage=75 -XX:+PrintFlagsFinal -version | grep ' MaxHeapSize '
+   size_t MaxHeapSize = 402653184   {product} {ergonomic}
+----
+
+== A layered Dockerfile
+
+The simplest approach is to copy the fat jar into the image and run `java -jar`. The problem: the fat jar is tens of MB, of which our code is only a few KB; the rest is libraries. Change one line of code and that whole blob becomes a new layer, sent again on every build and push.
+
+Spring Boot can split the fat jar into folders by how often they change: stable libraries, the Spring Boot loader, snapshot libraries, and the application code. Each folder becomes its own Docker layer:
+
+[source,dockerfile]
+.microservices/product-service/Dockerfile
+----
+FROM eclipse-temurin:21-jre AS builder
+WORKDIR /builder
+COPY build/libs/*.jar app.jar
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination extracted
+
+FROM eclipse-temurin:21-jre
+WORKDIR /application
+COPY --from=builder /builder/extracted/dependencies/ ./
+COPY --from=builder /builder/extracted/spring-boot-loader/ ./
+COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
+COPY --from=builder /builder/extracted/application/ ./
+EXPOSE 8080
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+----
+
+This is a two-stage build: the `builder` stage only extracts the jar, and the final image only contains the result. The `COPY` instructions go from least to most frequently changed, so when only the code changes, Docker reuses the cache for the first three layers and only rebuilds the tiny `application` layer.
+
+[NOTE]
+====
+*Different from the book:* the book uses `-Djarmode=layertools -jar app.jar extract`. Since Spring Boot 3.3, `layertools` is deprecated in favor of `-Djarmode=tools ... extract --layers --launcher`. The result is the same four folders. The `JarLauncher` class also moved to `org.springframework.boot.loader.launch.JarLauncher` in Spring Boot 3.2.
+====
+
+All four services use the same Dockerfile; copy it into each of the four folders.
+
+== Docker-specific configuration with a profile
+
+Inside Docker, each container has its own IP address, so there is no reason to use four different ports anymore: everything runs on 8080. The composite also stops calling `localhost` and calls the services by their Docker Compose names. Add a `docker` profile at the end of `application.yml`, separated by `---`:
+
+[source,yaml]
+.product-service, review-service, recommendation-service
+----
+---
+spring.config.activate.on-profile: docker
+
+server.port: 8080
+----
+
+[source,yaml]
+.product-composite-service
+----
+---
+spring.config.activate.on-profile: docker
+
+server.port: 8080
+
+app:
+  product-service:
+    host: product
+    port: 8080
+  recommendation-service:
+    host: recommendation
+    port: 8080
+  review-service:
+    host: review
+    port: 8080
+----
+
+The profile only takes effect when we enable it with the environment variable `SPRING_PROFILES_ACTIVE=docker`. Running on your machine as in part 3 still uses the default configuration above it.
+
+== Docker Compose
+
+[source,yaml]
+.docker-compose.yml
+----
+services:
+  product:
+    build: microservices/product-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  recommendation:
+    build: microservices/recommendation-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  review:
+    build: microservices/review-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  product-composite:
+    build: microservices/product-composite-service
+    mem_limit: 512m
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+----
+
+A few notes:
+
+* The service names (`product`, `review`, ...) are also hostnames on the internal network Compose creates. That is why the composite can call `http://product:8080`.
+* Only `product-composite` has `ports`. The three core services cannot be called directly from your machine. This is the first step towards the "single entry point" rule, which is completed once we add the Gateway.
+* `mem_limit: 512m` per container. Following the experiment above, each JVM gets a maximum heap of 128 MB.
+
+Build and run:
+
+[source,bash]
+----
+./gradlew build
+docker compose build
+docker compose up -d
+docker compose logs -f
+----
+
+`docker compose build` reads the jars in `build/libs`, so always run `./gradlew build` first. Once you see `Started ProductCompositeServiceApplication`, try:
+
+[source,bash]
+----
+curl -s localhost:8080/product-composite/1 | jq .serviceAddresses
+----
+
+[source,json]
+----
+{
+  "cmp": "57e1832e5399/172.18.0.3:8080",
+  "pro": "8d74338b6cf9/172.18.0.2:8080",
+  "rev": "6ab4256c5279/172.18.0.5:8080",
+  "rec": "1d93de887774/172.18.0.4:8080"
+}
+----
+
+This time the hostname is the container ID and the IP is Docker's internal IP. The `serviceAddress` field from part 2 is what makes this visible.
+
+Check how much memory each container uses:
+
+[source,bash]
+----
+$ docker stats --no-stream --format '{{.Name}} {{.MemUsage}}'
+ecommerce-platform-recommendation-1 192.8MiB / 512MiB
+ecommerce-platform-product-1 166.9MiB / 512MiB
+ecommerce-platform-review-1 173MiB / 512MiB
+ecommerce-platform-product-composite-1 200.6MiB / 512MiB
+----
+
+Each service uses less than 200 MB, well below the 512 MB limit.
+
+== End-to-end testing with `test-em-all.bash`
+
+Unit tests check each service. We also need a test for _the whole system_ running in Docker. The book uses a bash script called `test-em-all.bash`, and I keep that approach because it runs anywhere with `curl` and `jq`, CI included.
+
+The two core functions:
+
+[source,bash]
+----
+function assertCurl() {
+  local expectedHttpCode=$1
+  local curlCmd="$2 -w \"%{http_code}\""
+  local result httpCode
+  result=$(eval $curlCmd)
+  httpCode="${result:(-3)}"
+  RESPONSE='' && (( ${#result} > 3 )) && RESPONSE="${result%???}"
+
+  if [ "$httpCode" = "$expectedHttpCode" ]; then
+    echo "Test OK (HTTP Code: $httpCode)"
+  else
+    echo "Test FAILED, EXPECTED HTTP Code: $expectedHttpCode, GOT: $httpCode, WILL ABORT!"
+    echo "- Failing command: $curlCmd"
+    echo "- Response Body: $RESPONSE"
+    exit 1
+  fi
+}
+
+function assertEqual() {
+  local expected=$1 actual=$2
+
+  if [ "$actual" = "$expected" ]; then
+    echo "Test OK (actual value: $actual)"
+  else
+    echo "Test FAILED, EXPECTED VALUE: $expected, ACTUAL VALUE: $actual, WILL ABORT"
+    exit 1
+  fi
+}
+----
+
+`assertCurl` calls the API, takes the last three characters as the HTTP status, and stores the rest in `RESPONSE` so that `assertEqual` can check it further with `jq`. The test cases use exactly the simulation rules we set up earlier:
+
+[source,bash]
+----
+waitForService "http://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS"
+
+# Normal product: 3 recommendations and 3 reviews
+assertCurl 200 "curl http://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS -s"
+assertEqual "$PROD_ID_REVS_RECS" $(echo $RESPONSE | jq .productId)
+assertEqual 3 $(echo $RESPONSE | jq ".recommendations | length")
+assertEqual 3 $(echo $RESPONSE | jq ".reviews | length")
+
+# Unknown product: 404 with a clear message
+assertCurl 404 "curl http://$HOST:$PORT/product-composite/$PROD_ID_NOT_FOUND -s"
+assertEqual "\"No product found for productId: $PROD_ID_NOT_FOUND\"" "$(echo $RESPONSE | jq .message)"
+
+# Product without recommendations
+assertCurl 200 "curl http://$HOST:$PORT/product-composite/$PROD_ID_NO_RECS -s"
+assertEqual 0 $(echo $RESPONSE | jq ".recommendations | length")
+assertEqual 3 $(echo $RESPONSE | jq ".reviews | length")
+
+# Product without reviews
+assertCurl 200 "curl http://$HOST:$PORT/product-composite/$PROD_ID_NO_REVS -s"
+assertEqual 3 $(echo $RESPONSE | jq ".recommendations | length")
+assertEqual 0 $(echo $RESPONSE | jq ".reviews | length")
+
+# Bad input: negative gives 422, non-numeric gives 400
+assertCurl 422 "curl http://$HOST:$PORT/product-composite/-1 -s"
+assertEqual "\"Invalid productId: -1\"" "$(echo $RESPONSE | jq .message)"
+
+assertCurl 400 "curl http://$HOST:$PORT/product-composite/invalidProductId -s"
+assertEqual "\"Type mismatch.\"" "$(echo $RESPONSE | jq .message)"
+----
+
+`waitForService` retries every 3 seconds until the composite answers, because a started container does not mean Spring Boot inside it is ready. The script also accepts two arguments: `start` to `docker compose down` and bring everything up from scratch, and `stop` to clean up afterwards. The full file is at tag `blog-04`.
+
+[source,bash]
+----
+$ ./test-em-all.bash start stop
+Start Tests: Fri Oct 2 05:59:31 UTC 2026
+HOST=localhost
+PORT=8080
+Restarting the test environment...
+Wait for: http://localhost:8080/product-composite/1... , retry #1 , retry #2 , retry #3 DONE, continues...
+Test OK (HTTP Code: 200)
+Test OK (actual value: 1)
+Test OK (actual value: 3)
+Test OK (actual value: 3)
+Test OK (HTTP Code: 404)
+Test OK (actual value: "No product found for productId: 13")
+...
+Test OK (HTTP Code: 400)
+Test OK (actual value: "Type mismatch.")
+We are done, stopping the test environment...
+End, all tests OK: Fri Oct 2 05:59:53 UTC 2026
+----
+
+From now on, whenever you change something, `./gradlew build && docker compose build && ./test-em-all.bash start stop` tells you whether the whole system still works.
+
+== Commit
+
+[source,bash]
+----
+chmod +x test-em-all.bash
+git add .
+git commit -m "Post 4: Docker and Docker Compose"
+git tag blog-04
+----
+
+== Summary
+
+* Modern JVMs respect container limits, and by default use a quarter of the memory for the heap.
+* A layered Dockerfile makes rebuilds fast when only the code changes.
+* The `docker` profile holds container-specific configuration and is enabled with an environment variable.
+* `docker compose up` replaces four terminals, and only the composite is exposed.
+* `test-em-all.bash` is the safety net for the whole system, and it grows with the series.
+
+The API works, but anyone who wants to use it has to read the code to know how to call it. In link:/en/blog/2026/ecommerce-microservices-05-openapi-swagger/[part 5], I add OpenAPI documentation and Swagger UI to the composite, written right in the interfaces of the `api` module.
