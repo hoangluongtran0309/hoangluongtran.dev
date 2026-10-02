@@ -1,0 +1,354 @@
+---
+title: "E-commerce microservices #2: the first service with Spring WebFlux"
+date: 2026-10-02T09:10:00+07:00
+tags: ["Java", "Spring Boot", "WebFlux", "Microservices", "Testing"]
+images: []
+summary: "Building product-service: a controller written from a shared interface, Project Reactor's Mono, global error handling, trying it with curl and testing it with WebTestClient."
+draft: false
+---
+
+[NOTE]
+====
+This is *part 2* of the e-commerce microservices series. The code for this post is at tag `blog-02`. If you have not read it yet, start with link:/en/blog/2026/ecommerce-microservices-01-setup/[part 1] for the Gradle skeleton and the `api` and `util` modules.
+====
+
+The previous post only gave us a skeleton. This one gives us the first thing that runs: `product-service`, the catalog service. It has no database yet (that comes in post 6), so its data is simulated in code. The goal is to understand how a Spring Boot microservice is put together, how it returns errors, and how it is tested.
+
+By the end of this post you will have:
+
+* `product-service` running on port 7001 and returning a product by id.
+* Errors returned in the shared format we wrote in part 1.
+* Four automated tests that call the real API through `WebTestClient`.
+
+== Create the module
+
+Add this to `settings.gradle`:
+
+[source,groovy]
+----
+include ':microservices:product-service'
+----
+
+Create the folders:
+
+[source,bash]
+----
+mkdir -p microservices/product-service/src/main/java/com/ecommerce/core/product/services
+mkdir -p microservices/product-service/src/main/resources
+mkdir -p microservices/product-service/src/test/java/com/ecommerce/core/product
+----
+
+[source,groovy]
+.microservices/product-service/build.gradle
+----
+apply plugin: 'org.springframework.boot' // <1>
+
+dependencies {
+    implementation project(':util')  // <2>
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+}
+
+jar {
+    enabled = false // <3>
+}
+----
+<1> This is a runnable service, so it applies the Spring Boot plugin. The version is declared in the root `build.gradle`.
+<2> Depends on `util`, and through it on `api`.
+<3> Disable the plain `jar` task and keep only the fat jar built by `bootJar`. `build/libs` then holds a single file, which makes the Dockerfile in post 4 simpler.
+
+== The main class
+
+[source,java]
+.ProductServiceApplication.java
+----
+package com.ecommerce.core.product;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
+@SpringBootApplication
+@ComponentScan("com.ecommerce")
+public class ProductServiceApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ProductServiceApplication.class, args);
+    }
+}
+----
+
+`@ComponentScan("com.ecommerce")` is what part 1 promised: without it, Spring only scans `com.ecommerce.core.product` and misses `GlobalControllerExceptionHandler` in `com.ecommerce.util`. Errors would still come back, but in Spring's default format instead of our `HttpErrorInfo`.
+
+== Knowing where a request was handled: `ServiceUtil`
+
+Once you run several instances of the same service, "which instance handled that request?" becomes a very common question. The book answers it with a `serviceAddress` field in every response. Add this class to the `util` module:
+
+[source,java]
+.util/src/main/java/com/ecommerce/util/http/ServiceUtil.java
+----
+package com.ecommerce.util.http;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+/** Returns "hostname/ip:port" of this instance, to see where a request was handled once we scale out. */
+@Component
+public class ServiceUtil {
+
+    private final String port;
+    private String serviceAddress = null;
+
+    @Autowired
+    public ServiceUtil(@Value("${server.port}") String port) {
+        this.port = port;
+    }
+
+    public String getServiceAddress() {
+        if (serviceAddress == null) {
+            serviceAddress = findMyHostname() + "/" + findMyIpAddress() + ":" + port;
+        }
+        return serviceAddress;
+    }
+
+    private String findMyHostname() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            return "unknown host name";
+        }
+    }
+
+    private String findMyIpAddress() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            return "unknown IP address";
+        }
+    }
+}
+----
+
+== The controller: just implement the interface
+
+Since `@GetMapping` already sits on `ProductService` in the `api` module, the controller declares no routes at all:
+
+[source,java]
+.services/ProductServiceImpl.java
+----
+package com.ecommerce.core.product.services;
+
+import com.ecommerce.api.core.product.Product;
+import com.ecommerce.api.core.product.ProductService;
+import com.ecommerce.api.exceptions.InvalidInputException;
+import com.ecommerce.api.exceptions.NotFoundException;
+import com.ecommerce.util.http.ServiceUtil;
+import java.math.BigDecimal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+
+@RestController
+public class ProductServiceImpl implements ProductService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProductServiceImpl.class);
+
+    private final ServiceUtil serviceUtil;
+
+    public ProductServiceImpl(ServiceUtil serviceUtil) {
+        this.serviceUtil = serviceUtil;
+    }
+
+    @Override
+    public Mono<Product> getProduct(int productId) {
+        LOG.debug("/product return the found product for productId={}", productId);
+
+        if (productId < 1) {
+            throw new InvalidInputException("Invalid productId: " + productId);
+        }
+        // No database yet (post 6), so we simulate: id 13 is a product that does not exist.
+        if (productId == 13) {
+            throw new NotFoundException("No product found for productId: " + productId);
+        }
+
+        return Mono.just(new Product(productId, "name-" + productId, new BigDecimal("199000"),
+            serviceUtil.getServiceAddress()));
+    }
+}
+----
+
+Two simulation rules are used throughout part 1 of the series: a negative id is invalid input (422), and id `13` is a product that does not exist (404).
+
+=== What is a `Mono`, briefly
+
+WebFlux runs on Netty with a handful of threads serving a large number of requests. A handler must not sit and wait (block) on a database or another service, because it would hold a thread that hundreds of other requests need. So instead of returning `Product`, the handler returns `Mono<Product>`: a promise of _at most one_ product. For lists you use `Flux<T>`: _0 to N_ elements. The framework subscribes and writes the result to the response when the data is ready.
+
+Here the data is available right away, so `Mono.just(...)` is enough. Its real power shows in part 3, when the composite calls three services in parallel without any extra threads.
+
+== Configuration
+
+[source,yaml]
+.src/main/resources/application.yml
+----
+server.port: 7001
+server.error.include-message: always
+
+spring.application.name: product
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce: DEBUG
+----
+
+Each service has its own port when running on your machine: composite is 7000, product 7001, recommendation 7002, review 7003. Once in Docker (post 4), they all use port 8080.
+
+== Try it
+
+[source,bash]
+----
+./gradlew :microservices:product-service:bootRun
+----
+
+In another terminal:
+
+[source,bash]
+----
+curl -s localhost:7001/product/1 | jq .
+----
+
+[source,json]
+----
+{
+  "productId": 1,
+  "name": "name-1",
+  "price": 199000,
+  "serviceAddress": "vm/127.0.0.1:7001"
+}
+----
+
+Try the error cases:
+
+[source,bash]
+----
+$ curl -s localhost:7001/product/13
+{"timestamp":"2026-10-02T06:04:29.236922979Z","path":"/product/13","httpStatus":"NOT_FOUND","message":"No product found for productId: 13"}
+
+$ curl -s localhost:7001/product/-1
+{"timestamp":"2026-10-02T06:04:29.269305958Z","path":"/product/-1","httpStatus":"UNPROCESSABLE_ENTITY","message":"Invalid productId: -1"}
+
+$ curl -s localhost:7001/product/abc
+{"timestamp":"2026-10-02T06:04:29.299+00:00","path":"/product/abc","status":400,"error":"Bad Request","requestId":"e794e373-5","message":"Type mismatch."}
+----
+
+Look at the last case: the JSON format is completely different. `abc` cannot be converted to an `int`, so the error happens before our controller is reached, and Spring answers with its default handler. The book leaves it that way too. The `server.error.include-message: always` line in the configuration is what makes the `message` field show up in this case.
+
+Actuator also gives us a health endpoint, which we will need in post 4 to know when a container is ready:
+
+[source,bash]
+----
+$ curl -s localhost:7001/actuator/health
+{"status":"UP"}
+----
+
+== Tests with `WebTestClient`
+
+`@SpringBootTest(webEnvironment = RANDOM_PORT)` starts the real service on a random port, and `WebTestClient` calls it like any HTTP client:
+
+[source,java]
+.src/test/java/com/ecommerce/core/product/ProductServiceApplicationTests.java
+----
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+class ProductServiceApplicationTests {
+
+    @Autowired
+    private WebTestClient client;
+
+    @Test
+    void getProductById() {
+        int productId = 1;
+
+        client.get()
+            .uri("/product/" + productId)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().contentType(APPLICATION_JSON)
+            .expectBody()
+            .jsonPath("$.productId").isEqualTo(productId)
+            .jsonPath("$.price").isEqualTo(199000);
+    }
+
+    @Test
+    void getProductInvalidParameterString() {
+        client.get()
+            .uri("/product/no-integer")
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isBadRequest()
+            .expectBody()
+            .jsonPath("$.path").isEqualTo("/product/no-integer");
+    }
+
+    @Test
+    void getProductNotFound() {
+        int productIdNotFound = 13;
+
+        client.get()
+            .uri("/product/" + productIdNotFound)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isEqualTo(NOT_FOUND)
+            .expectBody()
+            .jsonPath("$.path").isEqualTo("/product/" + productIdNotFound)
+            .jsonPath("$.message").isEqualTo("No product found for productId: " + productIdNotFound);
+    }
+
+    @Test
+    void getProductInvalidParameterNegativeValue() {
+        int productIdInvalid = -1;
+
+        client.get()
+            .uri("/product/" + productIdInvalid)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isEqualTo(UNPROCESSABLE_ENTITY)
+            .expectBody()
+            .jsonPath("$.message").isEqualTo("Invalid productId: " + productIdInvalid);
+    }
+}
+----
+
+The four tests cover all four paths: success, 400, 404 and 422. Run them:
+
+[source,bash]
+----
+./gradlew :microservices:product-service:test
+----
+
+The result is `BUILD SUCCESSFUL`. The detailed report is in `microservices/product-service/build/reports/tests/test/index.html`.
+
+== Commit
+
+[source,bash]
+----
+git add .
+git commit -m "Post 2: product-service with WebFlux"
+git tag blog-02
+----
+
+== Summary
+
+* A Spring Boot microservice needs very little code once the API contract lives in the `api` module.
+* `@ComponentScan("com.ecommerce")` loads the shared error handler.
+* `Mono` and `Flux` are how WebFlux returns results without blocking threads.
+* `WebTestClient` tests over real HTTP and is still fast.
+
+One service is not microservices yet. In link:/en/blog/2026/ecommerce-microservices-03-composite-service/[part 3], I add `review`, `recommendation` and `product-composite`, a service that calls the other three in parallel to build the product page.

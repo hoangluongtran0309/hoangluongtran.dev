@@ -1,0 +1,322 @@
+---
+title: "Microservices e-commerce #4: đóng gói bằng Docker, chạy cả hệ thống bằng Docker Compose"
+date: 2026-10-02T09:30:00+07:00
+tags: ["Java", "Spring Boot", "Docker", "Microservices", "Testing"]
+images: []
+summary: "Đóng gói bốn microservice thành Docker image theo layer, hiểu JVM nhìn thấy CPU và RAM của container ra sao, chạy cả hệ thống bằng Docker Compose và kiểm tra end-to-end bằng một script bash."
+draft: false
+---
+
+[NOTE]
+====
+Đây là *bài 4* trong series microservices e-commerce. Code của bài ở tag `blog-04`. Bài trước: link:/blog/2026/ecommerce-microservices-03-composite-service/[review, recommendation và service tổng hợp].
+====
+
+Cuối bài trước ta phải mở bốn terminal để chạy bốn tiến trình Java. Với mười service, cộng thêm MongoDB, MySQL và Kafka ở các bài sau, cách đó không đi xa được. Bài này đưa mọi thứ vào Docker:
+
+* Mỗi service thành một Docker image, build nhanh nhờ chia layer.
+* Hiểu JVM tính heap như thế nào khi chạy trong container bị giới hạn RAM.
+* `docker compose up` khởi động cả hệ thống, chỉ composite mở cổng ra ngoài.
+* Script `test-em-all.bash` kiểm tra end-to-end toàn bộ, chạy lại được bất cứ lúc nào.
+
+== JVM trong container: thử trước khi tin
+
+Trước khi viết Dockerfile, sách có một thí nghiệm đáng làm: xem JVM có tôn trọng giới hạn CPU và RAM của container không. Ngày xưa (Java 8 đời đầu) thì không, JVM nhìn thấy toàn bộ RAM của máy host và có thể bị container kill vì dùng quá giới hạn. Từ Java 10 trở đi thì có.
+
+Giới hạn còn 2 CPU:
+
+[source,bash]
+----
+$ echo 'Runtime.getRuntime().availableProcessors()' | docker run --rm -i --cpus=2 eclipse-temurin:21 jshell -q
+jshell> $1 ==> 2
+----
+
+Giới hạn RAM 512 MB rồi hỏi JVM heap tối đa là bao nhiêu:
+
+[source,bash]
+----
+$ docker run --rm -m=512m eclipse-temurin:21-jre java -XX:+PrintFlagsFinal -version | grep ' MaxHeapSize '
+   size_t MaxHeapSize = 134217728   {product} {ergonomic}
+----
+
+134217728 byte là đúng 128 MB, tức *một phần tư* RAM của container. Đó là mặc định của JVM khi không có `-Xmx`. Thử cấp phát 200 MB trong container 512 MB:
+
+[source,bash]
+----
+$ echo 'new byte[200_000_000]' | docker run --rm -i -m=512m eclipse-temurin:21 jshell -q
+|  Exception java.lang.OutOfMemoryError: Java heap space
+----
+
+Container còn trống hơn 300 MB nhưng JVM vẫn báo hết heap, vì nó tự giới hạn ở 128 MB. Với các service nhỏ của ta thì 128 MB là đủ. Khi một service cần nhiều hơn, thay vì ghi cứng `-Xmx`, mình sẽ dùng `-XX:MaxRAMPercentage=75` để heap luôn tỉ lệ với RAM của container:
+
+[source,bash]
+----
+$ docker run --rm -m=512m eclipse-temurin:21-jre java -XX:MaxRAMPercentage=75 -XX:+PrintFlagsFinal -version | grep ' MaxHeapSize '
+   size_t MaxHeapSize = 402653184   {product} {ergonomic}
+----
+
+== Dockerfile chia layer
+
+Cách đơn giản nhất là copy fat jar vào image rồi `java -jar`. Vấn đề: fat jar khoảng vài chục MB, trong đó code của ta chỉ chiếm vài KB, còn lại là thư viện. Sửa một dòng code là cả khối đó thành layer mới, mỗi lần build và push đều phải gửi lại toàn bộ.
+
+Spring Boot cho phép tách fat jar thành các thư mục theo tần suất thay đổi: thư viện ổn định, loader của Spring Boot, thư viện snapshot, và code ứng dụng. Mỗi thư mục thành một layer Docker riêng:
+
+[source,dockerfile]
+.microservices/product-service/Dockerfile
+----
+FROM eclipse-temurin:21-jre AS builder
+WORKDIR /builder
+COPY build/libs/*.jar app.jar
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination extracted
+
+FROM eclipse-temurin:21-jre
+WORKDIR /application
+COPY --from=builder /builder/extracted/dependencies/ ./
+COPY --from=builder /builder/extracted/spring-boot-loader/ ./
+COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
+COPY --from=builder /builder/extracted/application/ ./
+EXPOSE 8080
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+----
+
+Đây là build hai giai đoạn: giai đoạn `builder` chỉ để giải nén jar, image cuối chỉ chứa kết quả. Thứ tự `COPY` đi từ ít thay đổi đến hay thay đổi, nên khi chỉ sửa code, Docker dùng lại cache của ba layer đầu và chỉ build lại layer `application` nhỏ xíu.
+
+[NOTE]
+====
+*Chỗ khác sách:* sách dùng `-Djarmode=layertools -jar app.jar extract`. Từ Spring Boot 3.3, `layertools` bị deprecated và thay bằng `-Djarmode=tools ... extract --layers --launcher`. Kết quả vẫn là bốn thư mục như cũ. Đường dẫn của `JarLauncher` cũng đã đổi thành `org.springframework.boot.loader.launch.JarLauncher` từ Spring Boot 3.2.
+====
+
+Dockerfile của bốn service giống hệt nhau, copy sang cả bốn thư mục.
+
+== Cấu hình riêng cho Docker bằng profile
+
+Trong Docker, mỗi container có IP riêng, nên không còn lý do dùng bốn cổng khác nhau: tất cả chạy ở 8080. Composite cũng không gọi `localhost` nữa mà gọi theo tên service trong Docker Compose. Thêm một profile `docker` vào cuối `application.yml`, ngăn cách bằng `---`:
+
+[source,yaml]
+.product-service, review-service, recommendation-service
+----
+---
+spring.config.activate.on-profile: docker
+
+server.port: 8080
+----
+
+[source,yaml]
+.product-composite-service
+----
+---
+spring.config.activate.on-profile: docker
+
+server.port: 8080
+
+app:
+  product-service:
+    host: product
+    port: 8080
+  recommendation-service:
+    host: recommendation
+    port: 8080
+  review-service:
+    host: review
+    port: 8080
+----
+
+Profile chỉ có hiệu lực khi ta bật nó bằng biến môi trường `SPRING_PROFILES_ACTIVE=docker`. Chạy trên máy như bài 3 thì vẫn dùng cấu hình mặc định ở trên.
+
+== Docker Compose
+
+[source,yaml]
+.docker-compose.yml
+----
+services:
+  product:
+    build: microservices/product-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  recommendation:
+    build: microservices/recommendation-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  review:
+    build: microservices/review-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  product-composite:
+    build: microservices/product-composite-service
+    mem_limit: 512m
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+----
+
+Vài điểm:
+
+* Tên service (`product`, `review`, ...) cũng là hostname trong mạng nội bộ mà Compose tạo ra. Đó là lý do composite gọi được `http://product:8080`.
+* Chỉ `product-composite` có `ports`. Ba service lõi không thể gọi trực tiếp từ máy bạn. Đây là bước đầu của nguyên tắc "chỉ một cửa ngõ", sẽ hoàn chỉnh khi có Gateway.
+* `mem_limit: 512m` cho mỗi container. Theo thí nghiệm ở trên, mỗi JVM sẽ có heap tối đa 128 MB.
+
+Build và chạy:
+
+[source,bash]
+----
+./gradlew build
+docker compose build
+docker compose up -d
+docker compose logs -f
+----
+
+`docker compose build` đọc jar trong `build/libs`, nên luôn chạy `./gradlew build` trước. Khi thấy dòng `Started ProductCompositeServiceApplication`, thử gọi:
+
+[source,bash]
+----
+curl -s localhost:8080/product-composite/1 | jq .serviceAddresses
+----
+
+[source,json]
+----
+{
+  "cmp": "57e1832e5399/172.18.0.3:8080",
+  "pro": "8d74338b6cf9/172.18.0.2:8080",
+  "rev": "6ab4256c5279/172.18.0.5:8080",
+  "rec": "1d93de887774/172.18.0.4:8080"
+}
+----
+
+Lần này hostname là ID của container, IP là IP nội bộ của Docker. Chính trường `serviceAddress` từ bài 2 giúp ta thấy điều đó.
+
+Xem mỗi container dùng bao nhiêu RAM:
+
+[source,bash]
+----
+$ docker stats --no-stream --format '{{.Name}} {{.MemUsage}}'
+ecommerce-platform-recommendation-1 192.8MiB / 512MiB
+ecommerce-platform-product-1 166.9MiB / 512MiB
+ecommerce-platform-review-1 173MiB / 512MiB
+ecommerce-platform-product-composite-1 200.6MiB / 512MiB
+----
+
+Mỗi service dùng chưa tới 200 MB, còn dư nhiều so với giới hạn 512 MB.
+
+== Test end-to-end với `test-em-all.bash`
+
+Unit test kiểm tra từng service. Ta còn cần một bài kiểm tra cho _cả hệ thống_ khi đã chạy trong Docker. Sách dùng một script bash tên `test-em-all.bash`, và mình giữ cách đó vì nó chạy được ở mọi nơi có `curl` và `jq`, kể cả trong CI.
+
+Hai hàm cốt lõi:
+
+[source,bash]
+----
+function assertCurl() {
+  local expectedHttpCode=$1
+  local curlCmd="$2 -w \"%{http_code}\""
+  local result httpCode
+  result=$(eval $curlCmd)
+  httpCode="${result:(-3)}"
+  RESPONSE='' && (( ${#result} > 3 )) && RESPONSE="${result%???}"
+
+  if [ "$httpCode" = "$expectedHttpCode" ]; then
+    echo "Test OK (HTTP Code: $httpCode)"
+  else
+    echo "Test FAILED, EXPECTED HTTP Code: $expectedHttpCode, GOT: $httpCode, WILL ABORT!"
+    echo "- Failing command: $curlCmd"
+    echo "- Response Body: $RESPONSE"
+    exit 1
+  fi
+}
+
+function assertEqual() {
+  local expected=$1 actual=$2
+
+  if [ "$actual" = "$expected" ]; then
+    echo "Test OK (actual value: $actual)"
+  else
+    echo "Test FAILED, EXPECTED VALUE: $expected, ACTUAL VALUE: $actual, WILL ABORT"
+    exit 1
+  fi
+}
+----
+
+`assertCurl` gọi API, tách ba ký tự cuối là HTTP status, phần còn lại lưu vào biến `RESPONSE` để `assertEqual` kiểm tra tiếp bằng `jq`. Các ca test dùng đúng những quy ước giả lập đã đặt ra:
+
+[source,bash]
+----
+waitForService "http://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS"
+
+# Sản phẩm bình thường: có 3 gợi ý và 3 đánh giá
+assertCurl 200 "curl http://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS -s"
+assertEqual "$PROD_ID_REVS_RECS" $(echo $RESPONSE | jq .productId)
+assertEqual 3 $(echo $RESPONSE | jq ".recommendations | length")
+assertEqual 3 $(echo $RESPONSE | jq ".reviews | length")
+
+# Sản phẩm không tồn tại: 404 và message rõ ràng
+assertCurl 404 "curl http://$HOST:$PORT/product-composite/$PROD_ID_NOT_FOUND -s"
+assertEqual "\"No product found for productId: $PROD_ID_NOT_FOUND\"" "$(echo $RESPONSE | jq .message)"
+
+# Sản phẩm chưa có gợi ý
+assertCurl 200 "curl http://$HOST:$PORT/product-composite/$PROD_ID_NO_RECS -s"
+assertEqual 0 $(echo $RESPONSE | jq ".recommendations | length")
+assertEqual 3 $(echo $RESPONSE | jq ".reviews | length")
+
+# Sản phẩm chưa có đánh giá
+assertCurl 200 "curl http://$HOST:$PORT/product-composite/$PROD_ID_NO_REVS -s"
+assertEqual 3 $(echo $RESPONSE | jq ".recommendations | length")
+assertEqual 0 $(echo $RESPONSE | jq ".reviews | length")
+
+# Đầu vào sai: số âm thì 422, không phải số thì 400
+assertCurl 422 "curl http://$HOST:$PORT/product-composite/-1 -s"
+assertEqual "\"Invalid productId: -1\"" "$(echo $RESPONSE | jq .message)"
+
+assertCurl 400 "curl http://$HOST:$PORT/product-composite/invalidProductId -s"
+assertEqual "\"Type mismatch.\"" "$(echo $RESPONSE | jq .message)"
+----
+
+`waitForService` gọi lặp lại mỗi 3 giây cho tới khi composite trả lời, vì container khởi động xong không có nghĩa là Spring Boot bên trong đã sẵn sàng. Script còn nhận hai tham số: `start` để `docker compose down` rồi `up` lại từ đầu, và `stop` để dọn dẹp khi xong. File đầy đủ nằm ở tag `blog-04`.
+
+[source,bash]
+----
+$ ./test-em-all.bash start stop
+Start Tests: Fri Oct 2 05:59:31 UTC 2026
+HOST=localhost
+PORT=8080
+Restarting the test environment...
+Wait for: http://localhost:8080/product-composite/1... , retry #1 , retry #2 , retry #3 DONE, continues...
+Test OK (HTTP Code: 200)
+Test OK (actual value: 1)
+Test OK (actual value: 3)
+Test OK (actual value: 3)
+Test OK (HTTP Code: 404)
+Test OK (actual value: "No product found for productId: 13")
+...
+Test OK (HTTP Code: 400)
+Test OK (actual value: "Type mismatch.")
+We are done, stopping the test environment...
+End, all tests OK: Fri Oct 2 05:59:53 UTC 2026
+----
+
+Từ giờ, mỗi khi sửa gì đó, chỉ cần `./gradlew build && docker compose build && ./test-em-all.bash start stop` là biết cả hệ thống còn chạy đúng hay không.
+
+== Commit
+
+[source,bash]
+----
+chmod +x test-em-all.bash
+git add .
+git commit -m "Bài 4: Docker và Docker Compose"
+git tag blog-04
+----
+
+== Tổng kết
+
+* JVM hiện đại tôn trọng giới hạn của container, và mặc định lấy một phần tư RAM làm heap.
+* Dockerfile chia layer giúp build lại nhanh khi chỉ sửa code.
+* Profile `docker` gom cấu hình riêng cho môi trường container, kích hoạt bằng biến môi trường.
+* `docker compose up` thay cho bốn terminal, và chỉ composite lộ ra ngoài.
+* `test-em-all.bash` là lưới an toàn cho cả hệ thống, sẽ lớn dần theo series.
+
+API đã chạy, nhưng người khác muốn dùng thì phải đọc code mới biết gọi thế nào. Ở link:/blog/2026/ecommerce-microservices-05-openapi-swagger/[bài 5], mình thêm tài liệu OpenAPI và Swagger UI cho composite, viết ngay trong interface của module `api`.
