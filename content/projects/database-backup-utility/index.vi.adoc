@@ -1,0 +1,46 @@
+---
+title: "Database Backup Utility"
+subtitle: "Công cụ backup và restore logic cho bảy database engine, nơi mỗi backup có checksum và có thể được restore thử trong một database dùng một lần."
+cover: "cover.svg"
+imageAlt: "Minh họa Database Backup Utility: các database engine được dump thành artifact có SHA-256, lưu vào storage, rồi được restore thử trong một container dùng một lần."
+weight: 2
+ctaPrimary:
+  label: "Xem mã nguồn"
+  url: "https://github.com/hoangluongtran0309/database-backup-utility"
+ctaSecondary:
+  label: "Xem v0.20.0"
+  url: "https://github.com/hoangluongtran0309/database-backup-utility/releases/tag/v0.20.0"
+draft: false
+---
+
+Database Backup Utility là ứng dụng web tự host để backup và restore logic cho *MySQL, MariaDB, PostgreSQL, MongoDB và SQLite*, cùng *Oracle* và *SQL Server* qua các client pack tùy chọn. Bạn điều khiển nó từ một web console nhỏ, một HTTP API có version (`/api/v1`) hoặc CLI `dbbackup`. Artifact được lưu ở ổ đĩa local, storage tương thích S3, Google Cloud Storage hoặc Azure Blob Storage.
+
+Phạm vi được giữ hẹp có chủ đích: *full logical dump và restore vào cùng engine*. Không có physical backup, không có incremental, không có point-in-time recovery, không chuyển đổi giữa các engine.
+
+== Điểm nổi bật
+
+* Mỗi engine dùng đúng client gốc của nó: `mysqldump`, `mariadb-dump`, `pg_dump` 17, `mongodump`, `sqlite3`, Oracle Data Pump và SqlPackage. Artifact giữ nguyên định dạng chuẩn của engine.
+* Mọi artifact có SHA-256, được kiểm tra lại trước *mỗi* lần restore; file bị thay đổi sẽ không bao giờ chạm tới database đích.
+* Restore vào bất kỳ target nào cùng engine, xác nhận bằng cách gõ tên database đích.
+* *Restore verification* tách biệt: restore backup vào một database Docker dùng một lần, kiểm tra sức khỏe từng bảng rồi xóa đi, chạy thủ công hoặc tự động sau mỗi backup.
+* Lịch Quartz theo cron ở bất kỳ múi giờ IANA nào; retention theo từng target và không bao giờ xóa backup đã từng được restore.
+* Thông báo qua Telegram, Slack, Email và Webhook, đăng ký theo từng target và từng sự kiện.
+* Một tài khoản operator băm bcrypt, CSRF trên mọi form, mọi credential lưu trữ được mã hóa AES-256-GCM; CLI từ chối nhận secret trên dòng lệnh.
+
+== Công nghệ
+
+`Java 21` · `Spring Boot 4.1` · `PostgreSQL` · `Flyway` · `Thymeleaf` · `Quartz` · `Docker` · `Testcontainers` · `GitHub Actions`
+
+Dự án là một ứng dụng hexagonal chia thành năm Maven module: `core` không có dependency nào, `application` chỉ biết các port trong `core`, `adapters` chứa phần kỹ thuật, `web` là composition root, và `cli` là một HTTP client độc lập. Ranh giới module chính là ranh giới kiến trúc: vượt sai ranh giới là lỗi compile, không phải một comment khi review.
+
+== Trạng thái hiện tại
+
+Phiên bản mới nhất là v0.20.0, bản phát hành thứ 20 kể từ v0.1.0 ngày 14/09/2026. Mỗi tính năng là một lát cắt dọc hoàn chỉnh (domain, adapter, use case, giao diện, migration, test và tài liệu trong cùng một commit), và 37 ADR ghi lại các quyết định kiến trúc. Release được publish tự động lên GHCR kèm JAR, checksum, SBOM và attestation.
+
+Hai lát cắt sửa lỗi giao diện và webhook từ đợt chạy thử toàn bộ tính năng vẫn đang mở. Những thứ *cố ý không có*: physical backup, incremental, point-in-time recovery và restore giữa hai engine khác nhau. Ứng dụng chỉ có một tài khoản operator dùng chung, nên console không thể biết *ai* đã khởi chạy một lần restore.
+
+== Series bài viết
+
+. link:/blog/2026/building-database-backup-utility/[Xây dựng Database Backup Utility: kiến trúc hexagonal và lát cắt dọc] — bài toán, năm Maven module, gọi thẳng client gốc của database và chạy job nền một cách trung thực.
+. link:/blog/2026/backup-restore-verification/[Bảy database engine và một câu hỏi: backup này có restore được không?] — route theo engine, checksum, restore dạng stream, storage profile và restore verification.
+. link:/blog/2026/backup-utility-security-operations/[Bảo mật và vận hành một công cụ cầm chìa khóa mọi database] — mã hóa credential, một tài khoản operator, CLI qua HTTP API và CI có attestation.
