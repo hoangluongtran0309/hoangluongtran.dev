@@ -1,0 +1,46 @@
+---
+title: "Database Backup Utility"
+subtitle: "Logical backup and restore for seven database engines, where every backup carries a checksum and can be test-restored into a disposable database."
+cover: "cover.en.svg"
+imageAlt: "Database Backup Utility illustration: database engines are dumped into SHA-256 checked artifacts, kept in storage, then test-restored in a disposable container."
+weight: 2
+ctaPrimary:
+  label: "View source"
+  url: "https://github.com/hoangluongtran0309/database-backup-utility"
+ctaSecondary:
+  label: "See v0.20.0"
+  url: "https://github.com/hoangluongtran0309/database-backup-utility/releases/tag/v0.20.0"
+draft: false
+---
+
+Database Backup Utility is a self-hosted web application for logical backup and restore of *MySQL, MariaDB, PostgreSQL, MongoDB and SQLite*, plus *Oracle* and *SQL Server* through optional client packs. You drive it from a small web console, a versioned HTTP API (`/api/v1`) or the `dbbackup` CLI. Artifacts go to local disk, S3-compatible storage, Google Cloud Storage or Azure Blob Storage.
+
+The scope is deliberately narrow: *full logical dumps and restores into the same engine*. There are no physical backups, no incremental chains, no point-in-time recovery and no conversion between engines.
+
+== Highlights
+
+* Every engine uses its own native client: `mysqldump`, `mariadb-dump`, `pg_dump` 17, `mongodump`, `sqlite3`, Oracle Data Pump and SqlPackage. Each artifact stays in the engine's normal format.
+* Every artifact has a SHA-256 that is checked again before *every* restore; a changed file never reaches the destination database.
+* Restore into any target of the same engine, confirmed by typing the destination's name.
+* Isolated *restore verification*: restore a backup into a disposable Docker database, health-check every table, then remove it, either on demand or automatically after each backup.
+* Quartz cron schedules in any IANA time zone; per-target retention that never prunes a backup that has been restored.
+* Telegram, Slack, Email and Webhook notifications, subscribed per target and per event.
+* One bcrypt-hashed operator account, CSRF on every form, AES-256-GCM for every stored credential; the CLI refuses secrets on the command line.
+
+== Technology
+
+`Java 21` · `Spring Boot 4.1` · `PostgreSQL` · `Flyway` · `Thymeleaf` · `Quartz` · `Docker` · `Testcontainers` · `GitHub Actions`
+
+The project is a hexagonal application in five Maven modules: `core` has no dependencies at all, `application` knows only the ports in `core`, `adapters` holds everything technical, `web` is the composition root, and `cli` is a standalone HTTP client. The module boundary is the architectural boundary: crossing it wrongly is a compile error, not a review comment.
+
+== Current status
+
+The latest version is v0.20.0, the twentieth release since v0.1.0 on 14 September 2026. Every feature is one complete vertical slice (domain, adapter, use case, UI, migration, tests and documentation in a single commit), and 37 ADRs record the architectural decisions. Releases are published automatically to GHCR with JARs, checksums, SBOMs and attestations.
+
+Two fix slices from the full feature walkthrough are still open. What is *deliberately absent*: physical backups, incremental backups, point-in-time recovery and restores between different engines. There is a single shared operator account, so the console cannot tell *who* started a restore.
+
+== Article series
+
+. link:/en/blog/2026/building-database-backup-utility/[Building Database Backup Utility: hexagonal architecture and vertical slices] — the problem, five Maven modules, driving native database clients and running background jobs honestly.
+. link:/en/blog/2026/backup-restore-verification/[Seven database engines and one question: will this backup restore?] — engine routing, checksums, streamed restores, storage profiles and restore verification.
+. link:/en/blog/2026/backup-utility-security-operations/[Securing and operating a tool that holds the keys to every database] — credential encryption, one operator account, a CLI over the HTTP API and attested CI releases.
