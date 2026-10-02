@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 610" role="img" aria-labelledby="title desc">
+  <title id="title">Hệ thống sau bài 7</title>
+  <desc id="desc">product-composite gọi product, recommendation, review và inventory. order-service được gọi trực tiếp từ client ở cổng 8081. product và recommendation dùng MongoDB; review, inventory và order dùng ba database riêng trên cùng một MySQL.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#16233a"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#7cc4ff"/></marker>
+  </defs>
+  <rect width="1200" height="610" rx="24" fill="url(#bg)"/>
+  <g font-family="Liberation Sans, sans-serif">
+    <text x="50" y="60" fill="#eef4ff" font-size="30" font-weight="700">Thêm inventory và order (bài 7)</text>
+    <text x="50" y="94" fill="#9fb0c8" font-size="18">Xanh: gọi REST · Mỗi service chỉ đọc ghi database của riêng nó</text>
+    <rect x="355" y="120" width="180" height="50" rx="12" fill="#1d2b45" stroke="#4a6a9a" stroke-width="2"/>
+    <text x="445.0" y="151.0" fill="#eef4ff" font-size="18"  text-anchor="middle">Client</text>
+    <rect x="315" y="210" width="260" height="64" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="445.0" y="238.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">product-composite</text>
+    <text x="445.0" y="260.0" fill="#9fb0c8" font-size="14" text-anchor="middle">không lưu dữ liệu</text>
+    <line x1="445" y1="170" x2="445" y2="206" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <rect x="900" y="210" width="250" height="64" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="1025.0" y="238.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">order-service</text>
+    <text x="1025.0" y="260.0" fill="#9fb0c8" font-size="14" text-anchor="middle">:7005 · tạm mở cổng 8081</text>
+    <rect x="1098" y="198" width="56" height="24" rx="12" fill="#f5b94a"/>
+    <text x="1126" y="215" fill="#0b1220" font-size="13" font-weight="700" text-anchor="middle">mới</text>
+    <path d="M535 145 H1025 V206" fill="none" stroke="#7cc4ff" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <rect x="40" y="360" width="180" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="130.0" y="386.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">product</text>
+    <text x="130.0" y="408.0" fill="#9fb0c8" font-size="14" text-anchor="middle">:7001</text>
+    <line x1="445" y1="274" x2="130.0" y2="356" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <rect x="250" y="360" width="180" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="340.0" y="386.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">recommendation</text>
+    <text x="340.0" y="408.0" fill="#9fb0c8" font-size="14" text-anchor="middle">:7002</text>
+    <line x1="445" y1="274" x2="340.0" y2="356" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <rect x="460" y="360" width="180" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="550.0" y="386.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">review</text>
+    <text x="550.0" y="408.0" fill="#9fb0c8" font-size="14" text-anchor="middle">:7003</text>
+    <line x1="445" y1="274" x2="550.0" y2="356" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <rect x="670" y="360" width="180" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="760.0" y="386.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">inventory</text>
+    <text x="760.0" y="408.0" fill="#9fb0c8" font-size="14" text-anchor="middle">:7004</text>
+    <rect x="798" y="348" width="56" height="24" rx="12" fill="#f5b94a"/>
+    <text x="826" y="365" fill="#0b1220" font-size="13" font-weight="700" text-anchor="middle">mới</text>
+    <line x1="445" y1="274" x2="760.0" y2="356" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <path d="M60 510 v50 a70.0 10 0 0 0 140 0 v-50" fill="#1a2236" stroke="#4fd1a5" stroke-width="2"/>
+    <ellipse cx="130.0" cy="510" rx="70.0" ry="10" fill="#22304a" stroke="#4fd1a5" stroke-width="2"/>
+    <text x="130.0" y="542" fill="#eef4ff" font-size="16" font-weight="700" text-anchor="middle">MongoDB</text>
+    <text x="130.0" y="562" fill="#9fb0c8" font-size="13" text-anchor="middle">product-db</text>
+    <line x1="130.0" y1="420" x2="130.0" y2="496" stroke="#9fb0c8" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <path d="M270 510 v50 a70.0 10 0 0 0 140 0 v-50" fill="#1a2236" stroke="#4fd1a5" stroke-width="2"/>
+    <ellipse cx="340.0" cy="510" rx="70.0" ry="10" fill="#22304a" stroke="#4fd1a5" stroke-width="2"/>
+    <text x="340.0" y="542" fill="#eef4ff" font-size="16" font-weight="700" text-anchor="middle">MongoDB</text>
+    <text x="340.0" y="562" fill="#9fb0c8" font-size="13" text-anchor="middle">recommendation-db</text>
+    <line x1="340.0" y1="420" x2="340.0" y2="496" stroke="#9fb0c8" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <path d="M480 510 v50 a70.0 10 0 0 0 140 0 v-50" fill="#1a2236" stroke="#f08a8a" stroke-width="2"/>
+    <ellipse cx="550.0" cy="510" rx="70.0" ry="10" fill="#22304a" stroke="#f08a8a" stroke-width="2"/>
+    <text x="550.0" y="542" fill="#eef4ff" font-size="16" font-weight="700" text-anchor="middle">MySQL</text>
+    <text x="550.0" y="562" fill="#9fb0c8" font-size="13" text-anchor="middle">review_db</text>
+    <line x1="550.0" y1="420" x2="550.0" y2="496" stroke="#9fb0c8" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <path d="M690 510 v50 a70.0 10 0 0 0 140 0 v-50" fill="#1a2236" stroke="#f08a8a" stroke-width="2"/>
+    <ellipse cx="760.0" cy="510" rx="70.0" ry="10" fill="#22304a" stroke="#f08a8a" stroke-width="2"/>
+    <text x="760.0" y="542" fill="#eef4ff" font-size="16" font-weight="700" text-anchor="middle">MySQL</text>
+    <text x="760.0" y="562" fill="#9fb0c8" font-size="13" text-anchor="middle">inventory_db</text>
+    <line x1="760.0" y1="420" x2="760.0" y2="496" stroke="#9fb0c8" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <path d="M945 510 v50 a80.0 10 0 0 0 160 0 v-50" fill="#1a2236" stroke="#f08a8a" stroke-width="2"/>
+    <ellipse cx="1025.0" cy="510" rx="80.0" ry="10" fill="#22304a" stroke="#f08a8a" stroke-width="2"/>
+    <text x="1025.0" y="542" fill="#eef4ff" font-size="16" font-weight="700" text-anchor="middle">MySQL</text>
+    <text x="1025.0" y="562" fill="#9fb0c8" font-size="13" text-anchor="middle">order_db</text>
+    <line x1="1025" y1="274" x2="1025" y2="496" stroke="#9fb0c8" stroke-width="2.5"  marker-end="url(#arrow)"/>
+  </g>
+</svg>
