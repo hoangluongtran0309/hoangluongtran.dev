@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-This is *part 1* of a build-in-public series on an e-commerce microservices platform. I follow the book _Microservices with Spring Boot 3 and Spring Cloud_ (3rd edition, Magnus Larsson), but replace its example with a shop that has a cart, inventory, orders and payments. Every post has a git tag (`blog-01`, `blog-02`, ...) so you can check out the exact state of the code for that post.
+This is *part 1* of a build-in-public series on an e-commerce microservices platform. I follow the book _Microservices with Spring Boot 3 and Spring Cloud_ (3rd edition, Magnus Larsson), but replace its example with a shop that has a cart, inventory, orders and payments. Every post has a git tag (`blog-01`, `blog-02`, ...) so you can check out the exact state of the code for that post. All the code lives in the link:https://github.com/hoangluongtran0309/ecommerce-platform[ecommerce-platform] repo on GitHub.
 ====
 
 I want to learn how to build a system that can scale, the kind of learning where you can actually do it afterwards. Reading a book and closing it means forgetting it quickly, so this time I am building a real project alongside each chapter and writing down every step. This series is that notebook.

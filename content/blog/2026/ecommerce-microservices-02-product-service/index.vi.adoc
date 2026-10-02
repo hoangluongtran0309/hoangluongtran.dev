@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-Đây là *bài 2* trong series microservices e-commerce. Code của bài ở tag `blog-02`. Nếu chưa đọc, hãy xem link:/blog/2026/ecommerce-microservices-01-setup/[bài 1] để có khung Gradle và hai module `api`, `util`.
+Đây là *bài 2* trong series microservices e-commerce. Code của bài ở tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-02[`blog-02`]. Nếu chưa đọc, hãy xem link:/blog/2026/ecommerce-microservices-01-setup/[bài 1] để có khung Gradle và hai module `api`, `util`.
 ====
 
 Bài trước mới có khung. Bài này ta có thứ chạy được đầu tiên: `product-service`, service quản lý catalog. Nó chưa có database (bài 6 mới thêm), nên dữ liệu được giả lập ngay trong code. Mục tiêu là nắm cách một microservice Spring Boot được dựng lên, trả lỗi ra sao, và được test thế nào.

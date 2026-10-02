@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-Đây là *bài 4* trong series microservices e-commerce. Code của bài ở tag `blog-04`. Bài trước: link:/blog/2026/ecommerce-microservices-03-composite-service/[review, recommendation và service tổng hợp].
+Đây là *bài 4* trong series microservices e-commerce. Code của bài ở tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-04[`blog-04`]. Bài trước: link:/blog/2026/ecommerce-microservices-03-composite-service/[review, recommendation và service tổng hợp].
 ====
 
 Cuối bài trước ta phải mở bốn terminal để chạy bốn tiến trình Java. Với mười service, cộng thêm MongoDB, MySQL và Kafka ở các bài sau, cách đó không đi xa được. Bài này đưa mọi thứ vào Docker:
@@ -276,7 +276,7 @@ assertCurl 400 "curl http://$HOST:$PORT/product-composite/invalidProductId -s"
 assertEqual "\"Type mismatch.\"" "$(echo $RESPONSE | jq .message)"
 ----
 
-`waitForService` gọi lặp lại mỗi 3 giây cho tới khi composite trả lời, vì container khởi động xong không có nghĩa là Spring Boot bên trong đã sẵn sàng. Script còn nhận hai tham số: `start` để `docker compose down` rồi `up` lại từ đầu, và `stop` để dọn dẹp khi xong. File đầy đủ nằm ở tag `blog-04`.
+`waitForService` gọi lặp lại mỗi 3 giây cho tới khi composite trả lời, vì container khởi động xong không có nghĩa là Spring Boot bên trong đã sẵn sàng. Script còn nhận hai tham số: `start` để `docker compose down` rồi `up` lại từ đầu, và `stop` để dọn dẹp khi xong. File đầy đủ nằm ở tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-04[`blog-04`].
 
 [source,bash]
 ----

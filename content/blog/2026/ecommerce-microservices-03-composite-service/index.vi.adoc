@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-Đây là *bài 3* trong series microservices e-commerce. Code của bài ở tag `blog-03`. Bài trước: link:/blog/2026/ecommerce-microservices-02-product-service/[service đầu tiên với Spring WebFlux].
+Đây là *bài 3* trong series microservices e-commerce. Code của bài ở tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-03[`blog-03`]. Bài trước: link:/blog/2026/ecommerce-microservices-02-product-service/[service đầu tiên với Spring WebFlux].
 ====
 
 Trang chi tiết sản phẩm của một shop cần ba thứ: thông tin sản phẩm, đánh giá của người mua, và các sản phẩm gợi ý. Ba thứ đó do ba service khác nhau sở hữu. Client không nên phải gọi ba lần rồi tự ghép, nên ta đặt một service đứng trước làm việc đó: `product-composite-service`.
