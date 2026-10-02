@@ -272,4 +272,4 @@ Sau năm bài, ta có:
 * Cả hệ thống chạy bằng một lệnh `docker compose up`, kiểm tra bằng `test-em-all.bash`.
 * Tài liệu API sinh từ code, đọc và thử được trên Swagger UI.
 
-Điểm yếu lớn nhất bây giờ là mọi dữ liệu đều giả lập: sản phẩm nào cũng tên `name-<id>`, giá 199.000. Phần 2 của series bắt đầu bằng việc thay chúng bằng dữ liệu thật: MongoDB cho catalog và gợi ý, MySQL cho đánh giá, mỗi service một database riêng, cùng API tạo và xoá sản phẩm qua composite.
+Điểm yếu lớn nhất bây giờ là mọi dữ liệu đều giả lập: sản phẩm nào cũng tên `name-<id>`, giá 199.000. link:/blog/2026/ecommerce-microservices-06-persistence/[Phần 2 của series] bắt đầu bằng việc thay chúng bằng dữ liệu thật: MongoDB cho catalog và gợi ý, MySQL cho đánh giá, mỗi service một database riêng, cùng API tạo và xoá sản phẩm qua composite.

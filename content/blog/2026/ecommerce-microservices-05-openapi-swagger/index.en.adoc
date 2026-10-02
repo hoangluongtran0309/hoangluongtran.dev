@@ -277,4 +277,4 @@ After five posts, we have:
 * The whole system running with one `docker compose up`, tested with `test-em-all.bash`.
 * API documentation generated from code, readable and testable in Swagger UI.
 
-The biggest weakness now is that all data is simulated: every product is called `name-<id>` and costs 199,000. Part 2 of the series starts by replacing it with real data: MongoDB for the catalog and recommendations, MySQL for reviews, one database per service, plus create and delete APIs through the composite.
+The biggest weakness now is that all data is simulated: every product is called `name-<id>` and costs 199,000. link:/en/blog/2026/ecommerce-microservices-06-persistence/[Part 2 of the series] starts by replacing it with real data: MongoDB for the catalog and recommendations, MySQL for reviews, one database per service, plus create and delete APIs through the composite.

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 610" role="img" aria-labelledby="title desc">
+  <title id="title">Database per service after post 6</title>
+  <desc id="desc">product-composite calls product, recommendation and review. product and recommendation use two separate MongoDB databases, review uses review_db on MySQL.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#16233a"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#7cc4ff"/></marker>
+  </defs>
+  <rect width="1200" height="610" rx="24" fill="url(#bg)"/>
+  <g font-family="Liberation Sans, sans-serif">
+    <text x="50" y="60" fill="#eef4ff" font-size="30" font-weight="700">One database per service (post 6)</text>
+    <text x="50" y="94" fill="#9fb0c8" font-size="18">Blue: REST calls · Each service only reads and writes its own database</text>
+    <rect x="510" y="120" width="180" height="50" rx="12" fill="#1d2b45" stroke="#4a6a9a" stroke-width="2"/>
+    <text x="600.0" y="151.0" fill="#eef4ff" font-size="18"  text-anchor="middle">Client</text>
+    <rect x="470" y="210" width="260" height="64" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="600.0" y="238.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">product-composite</text>
+    <text x="600.0" y="260.0" fill="#9fb0c8" font-size="14" text-anchor="middle">stateless</text>
+    <line x1="600" y1="170" x2="600" y2="206" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <rect x="240.0" y="360" width="200" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="340.0" y="386.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">product</text>
+    <text x="340.0" y="408.0" fill="#9fb0c8" font-size="14" text-anchor="middle">:7001</text>
+    <line x1="600" y1="274" x2="340.0" y2="356" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <rect x="500.0" y="360" width="200" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="600.0" y="386.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">recommendation</text>
+    <text x="600.0" y="408.0" fill="#9fb0c8" font-size="14" text-anchor="middle">:7002</text>
+    <line x1="600" y1="274" x2="600.0" y2="356" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <rect x="760.0" y="360" width="200" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="860.0" y="386.0" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">review</text>
+    <text x="860.0" y="408.0" fill="#9fb0c8" font-size="14" text-anchor="middle">:7003</text>
+    <line x1="600" y1="274" x2="860.0" y2="356" stroke="#7cc4ff" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <path d="M260.0 510 v50 a80.0 10 0 0 0 160 0 v-50" fill="#1a2236" stroke="#4fd1a5" stroke-width="2"/>
+    <ellipse cx="340.0" cy="510" rx="80.0" ry="10" fill="#22304a" stroke="#4fd1a5" stroke-width="2"/>
+    <text x="340.0" y="542" fill="#eef4ff" font-size="16" font-weight="700" text-anchor="middle">MongoDB</text>
+    <text x="340.0" y="562" fill="#9fb0c8" font-size="13" text-anchor="middle">product-db</text>
+    <line x1="340.0" y1="420" x2="340.0" y2="496" stroke="#9fb0c8" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <path d="M520.0 510 v50 a80.0 10 0 0 0 160 0 v-50" fill="#1a2236" stroke="#4fd1a5" stroke-width="2"/>
+    <ellipse cx="600.0" cy="510" rx="80.0" ry="10" fill="#22304a" stroke="#4fd1a5" stroke-width="2"/>
+    <text x="600.0" y="542" fill="#eef4ff" font-size="16" font-weight="700" text-anchor="middle">MongoDB</text>
+    <text x="600.0" y="562" fill="#9fb0c8" font-size="13" text-anchor="middle">recommendation-db</text>
+    <line x1="600.0" y1="420" x2="600.0" y2="496" stroke="#9fb0c8" stroke-width="2.5"  marker-end="url(#arrow)"/>
+    <path d="M780.0 510 v50 a80.0 10 0 0 0 160 0 v-50" fill="#1a2236" stroke="#f08a8a" stroke-width="2"/>
+    <ellipse cx="860.0" cy="510" rx="80.0" ry="10" fill="#22304a" stroke="#f08a8a" stroke-width="2"/>
+    <text x="860.0" y="542" fill="#eef4ff" font-size="16" font-weight="700" text-anchor="middle">MySQL</text>
+    <text x="860.0" y="562" fill="#9fb0c8" font-size="13" text-anchor="middle">review_db</text>
+    <line x1="860.0" y1="420" x2="860.0" y2="496" stroke="#9fb0c8" stroke-width="2.5"  marker-end="url(#arrow)"/>
+  </g>
+</svg>
