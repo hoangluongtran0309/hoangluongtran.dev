@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-This is *part 3* of the e-commerce microservices series. The code for this post is at tag `blog-03`. Previous post: link:/en/blog/2026/ecommerce-microservices-02-product-service/[the first service with Spring WebFlux].
+This is *part 3* of the e-commerce microservices series. The code for this post is at tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-03[`blog-03`]. Previous post: link:/en/blog/2026/ecommerce-microservices-02-product-service/[the first service with Spring WebFlux].
 ====
 
 A shop's product page needs three things: the product information, reviews from buyers, and recommended products. Three different services own them. The client should not have to make three calls and stitch the results together, so we put a service in front that does it: `product-composite-service`.

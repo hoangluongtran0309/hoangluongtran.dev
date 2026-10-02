@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-This is *part 2* of the e-commerce microservices series. The code for this post is at tag `blog-02`. If you have not read it yet, start with link:/en/blog/2026/ecommerce-microservices-01-setup/[part 1] for the Gradle skeleton and the `api` and `util` modules.
+This is *part 2* of the e-commerce microservices series. The code for this post is at tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-02[`blog-02`]. If you have not read it yet, start with link:/en/blog/2026/ecommerce-microservices-01-setup/[part 1] for the Gradle skeleton and the `api` and `util` modules.
 ====
 
 The previous post only gave us a skeleton. This one gives us the first thing that runs: `product-service`, the catalog service. It has no database yet (that comes in post 6), so its data is simulated in code. The goal is to understand how a Spring Boot microservice is put together, how it returns errors, and how it is tested.

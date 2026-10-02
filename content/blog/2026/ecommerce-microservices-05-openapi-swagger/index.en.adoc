@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-This is *part 5* of the e-commerce microservices series, and the last post of the foundations part. The code for this post is at tag `blog-05`. Previous post: link:/en/blog/2026/ecommerce-microservices-04-docker-compose/[packaging with Docker].
+This is *part 5* of the e-commerce microservices series, and the last post of the foundations part. The code for this post is at tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-05[`blog-05`]. Previous post: link:/en/blog/2026/ecommerce-microservices-04-docker-compose/[packaging with Docker].
 ====
 
 An API without documentation leaves its users two options: read the code or ask the author. With microservices, the "user" may be you three months from now, or the frontend team. This post adds OpenAPI documentation to the composite service, plus Swagger UI to read and try the API in the browser.

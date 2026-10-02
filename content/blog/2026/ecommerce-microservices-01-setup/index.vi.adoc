@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-Đây là *bài 1* trong series vừa làm vừa viết về một nền tảng e-commerce microservices. Mình bám theo cuốn _Microservices with Spring Boot 3 and Spring Cloud_ (3rd edition, Magnus Larsson), nhưng thay ví dụ trong sách bằng một shop có giỏ hàng, tồn kho, đặt hàng và thanh toán. Mỗi bài có một git tag (`blog-01`, `blog-02`, ...) để bạn checkout đúng trạng thái code của bài đó.
+Đây là *bài 1* trong series vừa làm vừa viết về một nền tảng e-commerce microservices. Mình bám theo cuốn _Microservices with Spring Boot 3 and Spring Cloud_ (3rd edition, Magnus Larsson), nhưng thay ví dụ trong sách bằng một shop có giỏ hàng, tồn kho, đặt hàng và thanh toán. Mỗi bài có một git tag (`blog-01`, `blog-02`, ...) để bạn checkout đúng trạng thái code của bài đó. Toàn bộ code nằm ở repo link:https://github.com/hoangluongtran0309/ecommerce-platform[ecommerce-platform] trên GitHub.
 ====
 
 Mình muốn học cách xây một hệ thống có thể scale, theo kiểu học được thì làm được. Đọc sách xong rồi gấp lại thì quên rất nhanh, nên lần này mình làm một dự án thật song song với từng chương và ghi lại từng bước. Series này là cuốn sổ ghi chép đó.

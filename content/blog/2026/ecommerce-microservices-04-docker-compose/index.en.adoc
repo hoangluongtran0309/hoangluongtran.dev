@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-This is *part 4* of the e-commerce microservices series. The code for this post is at tag `blog-04`. Previous post: link:/en/blog/2026/ecommerce-microservices-03-composite-service/[review, recommendation and the product page aggregator].
+This is *part 4* of the e-commerce microservices series. The code for this post is at tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-04[`blog-04`]. Previous post: link:/en/blog/2026/ecommerce-microservices-03-composite-service/[review, recommendation and the product page aggregator].
 ====
 
 At the end of the previous post we needed four terminals to run four Java processes. With ten services, plus MongoDB, MySQL and Kafka in later posts, that does not go far. This post moves everything into Docker:
@@ -276,7 +276,7 @@ assertCurl 400 "curl http://$HOST:$PORT/product-composite/invalidProductId -s"
 assertEqual "\"Type mismatch.\"" "$(echo $RESPONSE | jq .message)"
 ----
 
-`waitForService` retries every 3 seconds until the composite answers, because a started container does not mean Spring Boot inside it is ready. The script also accepts two arguments: `start` to `docker compose down` and bring everything up from scratch, and `stop` to clean up afterwards. The full file is at tag `blog-04`.
+`waitForService` retries every 3 seconds until the composite answers, because a started container does not mean Spring Boot inside it is ready. The script also accepts two arguments: `start` to `docker compose down` and bring everything up from scratch, and `stop` to clean up afterwards. The full file is at tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-04[`blog-04`].
 
 [source,bash]
 ----

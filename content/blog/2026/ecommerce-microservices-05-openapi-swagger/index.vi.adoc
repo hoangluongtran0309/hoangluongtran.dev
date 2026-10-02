@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-Đây là *bài 5* trong series microservices e-commerce, và là bài cuối của phần nền móng. Code của bài ở tag `blog-05`. Bài trước: link:/blog/2026/ecommerce-microservices-04-docker-compose/[đóng gói bằng Docker].
+Đây là *bài 5* trong series microservices e-commerce, và là bài cuối của phần nền móng. Code của bài ở tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-05[`blog-05`]. Bài trước: link:/blog/2026/ecommerce-microservices-04-docker-compose/[đóng gói bằng Docker].
 ====
 
 Một API không có tài liệu thì người dùng nó chỉ còn cách đọc code hoặc hỏi người viết. Với microservices, "người dùng" có khi là chính bạn ba tháng sau, hoặc đội frontend. Bài này thêm tài liệu OpenAPI cho composite service, kèm Swagger UI để đọc và gọi thử API ngay trên trình duyệt.
