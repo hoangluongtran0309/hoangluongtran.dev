@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Database Backup Utility</title>
+  <desc id="desc">Các database engine được dump thành artifact có SHA-256, lưu vào storage, rồi được restore thử trong một container dùng một lần.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07131a"/>
+      <stop offset="1" stop-color="#0f2a2e"/>
+    </linearGradient>
+    <linearGradient id="artifact" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ecfdf5"/>
+      <stop offset="1" stop-color="#bbf7d0"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#5eead4" stroke-opacity=".05" stroke-width="2"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#5eead4"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" rx="24" fill="url(#background)"/>
+  <rect width="1200" height="675" rx="24" fill="url(#grid)"/>
+  <path d="M0 580 240 500l320 50 300-100 340 70v155H0Z" fill="#0a1d22" opacity=".9"/>
+
+  <g transform="translate(74 84)">
+    <text x="0" y="70" fill="#5eead4" font-family="Liberation Mono, monospace" font-size="27" letter-spacing="5">JAVA 21 · HEXAGONAL</text>
+    <text x="0" y="156" fill="#f0fdfa" font-family="Liberation Sans, sans-serif" font-size="72" font-weight="700">Database Backup Utility</text>
+    <text x="2" y="211" fill="#a7c4c2" font-family="Liberation Sans, sans-serif" font-size="28">Backup chưa restore được thì chưa phải backup.</text>
+  </g>
+
+  <!-- Engines -->
+  <g font-family="Liberation Mono, monospace" font-size="18" fill="#ccfbf1">
+    <g transform="translate(80 350)">
+      <ellipse cx="80" cy="12" rx="80" ry="12" fill="#134e4a" stroke="#2dd4bf" stroke-width="2"/>
+      <path d="M0 12v196c0 7 36 12 80 12s80-5 80-12V12" fill="#0f3b3a" stroke="#2dd4bf" stroke-width="2"/>
+      <ellipse cx="80" cy="12" rx="80" ry="12" fill="#134e4a" stroke="#2dd4bf" stroke-width="2"/>
+      <text x="80" y="56" text-anchor="middle">MySQL</text>
+      <text x="80" y="82" text-anchor="middle">MariaDB</text>
+      <text x="80" y="108" text-anchor="middle">PostgreSQL</text>
+      <text x="80" y="134" text-anchor="middle">MongoDB</text>
+      <text x="80" y="160" text-anchor="middle">SQLite</text>
+      <text x="80" y="186" text-anchor="middle" fill="#fcd34d">Oracle</text>
+      <text x="80" y="210" text-anchor="middle" fill="#fcd34d">SQL Server</text>
+    </g>
+  </g>
+
+  <path d="M262 460h90" stroke="#5eead4" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- Artifact with checksum -->
+  <g transform="translate(370 352)" filter="url(#glow)">
+    <path d="M0 14a14 14 0 0 1 14-14h150l46 46v170a14 14 0 0 1-14 14H14A14 14 0 0 1 0 216Z" fill="url(#artifact)" stroke="#86efac" stroke-width="3"/>
+    <path d="M164 0v46h46" fill="#a7f3d0" stroke="#86efac" stroke-width="3"/>
+    <text x="22" y="46" fill="#064e3b" font-family="Liberation Mono, monospace" font-size="18" font-weight="700">.sql.gz</text>
+    <rect x="22" y="72" width="150" height="10" rx="5" fill="#34d399"/>
+    <rect x="22" y="94" width="120" height="10" rx="5" fill="#34d399"/>
+    <rect x="22" y="116" width="160" height="10" rx="5" fill="#34d399"/>
+    <rect x="22" y="160" width="166" height="40" rx="8" fill="#064e3b"/>
+    <text x="105" y="187" fill="#a7f3d0" font-family="Liberation Mono, monospace" font-size="17" text-anchor="middle">SHA-256 ✓</text>
+  </g>
+
+  <path d="M600 460h90" stroke="#5eead4" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- Storage -->
+  <g transform="translate(708 372)" font-family="Liberation Sans, sans-serif">
+    <rect width="170" height="176" rx="18" fill="#0f2f33" stroke="#2dd4bf" stroke-width="3"/>
+    <g font-size="19" fill="#ccfbf1" text-anchor="middle">
+      <text x="85" y="46">Local</text>
+      <text x="85" y="82">S3</text>
+      <text x="85" y="118">GCS</text>
+      <text x="85" y="154">Azure</text>
+    </g>
+  </g>
+
+  <path d="M896 460h90" stroke="#5eead4" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- Disposable verification -->
+  <g transform="translate(1000 360)" font-family="Liberation Sans, sans-serif">
+    <rect width="150" height="200" rx="18" fill="#0f2f33" stroke="#fcd34d" stroke-width="3" stroke-dasharray="10 7"/>
+    <circle cx="75" cy="86" r="42" fill="#14532d" stroke="#86efac" stroke-width="4"/>
+    <path d="M55 87l14 14 27-29" fill="none" stroke="#bbf7d0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="75" y="160" fill="#fde68a" font-size="18" text-anchor="middle">restore thử</text>
+    <text x="75" y="184" fill="#a7c4c2" font-size="16" text-anchor="middle">rồi xóa đi</text>
+  </g>
+</svg>
