@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">Một lần restore verification</title>
+  <desc id="desc">Artifact được lấy từ storage về thư mục riêng và kiểm tra SHA-256, một container database dùng một lần không publish port được khởi động, backup được restore vào đó, health check chạy cho từng bảng, container bị xóa, và chỉ khi đó kết quả thành công mới được lưu. Thất bại ở bất kỳ bước nào ghi lần verification là FAILED nhưng không đổi trạng thái của backup.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07131a"/><stop offset="1" stop-color="#0f2a2e"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity=".3"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#5eead4"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#fca5a5"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="640" rx="24" fill="url(#bg)"/>
+  <text x="60" y="68" fill="#f0fdfa" font-family="Liberation Sans, sans-serif" font-size="34" font-weight="700">Restore thử, rồi dọn sạch</text>
+  <text x="60" y="105" fill="#a7c4c2" font-family="Liberation Sans, sans-serif" font-size="20">Không chạm vào target nào của operator, không dùng credential của target nguồn.</text>
+
+  <!-- Disposable container boundary -->
+  <rect x="408" y="150" width="560" height="250" rx="22" fill="none" stroke="#fcd34d" stroke-width="2" stroke-dasharray="10 8"/>
+  <text x="428" y="180" fill="#fde68a" font-family="Liberation Sans, sans-serif" font-size="16" font-weight="700" letter-spacing="2">CONTAINER DÙNG MỘT LẦN · KHÔNG PUBLISH PORT</text>
+
+  <g font-family="Liberation Sans, sans-serif" text-anchor="middle" filter="url(#shadow)">
+    <rect x="40" y="220" width="160" height="130" rx="16" fill="#0f2f33" stroke="#2dd4bf" stroke-width="2"/>
+    <text x="120" y="262" fill="#f0fdfa" font-size="21" font-weight="700">1. Lấy về</text>
+    <text x="120" y="292" fill="#a7c4c2" font-size="16">Local · S3</text>
+    <text x="120" y="314" fill="#a7c4c2" font-size="16">GCS · Azure</text>
+
+    <rect x="226" y="220" width="160" height="130" rx="16" fill="#14532d" stroke="#86efac" stroke-width="2"/>
+    <text x="306" y="262" fill="#f0fdfa" font-size="21" font-weight="700">2. SHA-256</text>
+    <text x="306" y="292" fill="#bbf7d0" font-size="16">khớp với</text>
+    <text x="306" y="314" fill="#bbf7d0" font-size="16">giá trị đã ghi</text>
+
+    <rect x="428" y="220" width="160" height="130" rx="16" fill="#0f2f33" stroke="#2dd4bf" stroke-width="2"/>
+    <text x="508" y="262" fill="#f0fdfa" font-size="21" font-weight="700">3. Khởi động</text>
+    <text x="508" y="292" fill="#a7c4c2" font-size="16">mysql:8.4</text>
+    <text x="508" y="314" fill="#a7c4c2" font-size="16">postgres:17 …</text>
+
+    <rect x="614" y="220" width="160" height="130" rx="16" fill="#0f2f33" stroke="#2dd4bf" stroke-width="2"/>
+    <text x="694" y="262" fill="#f0fdfa" font-size="21" font-weight="700">4. Restore</text>
+    <text x="694" y="292" fill="#a7c4c2" font-size="16">bằng client</text>
+    <text x="694" y="314" fill="#a7c4c2" font-size="16">của engine</text>
+
+    <rect x="800" y="220" width="150" height="130" rx="16" fill="#0f2f33" stroke="#2dd4bf" stroke-width="2"/>
+    <text x="875" y="262" fill="#f0fdfa" font-size="21" font-weight="700">5. Kiểm tra</text>
+    <text x="875" y="292" fill="#a7c4c2" font-size="15">CHECK TABLE</text>
+    <text x="875" y="314" fill="#a7c4c2" font-size="15">validate · DBCC</text>
+
+    <rect x="990" y="220" width="170" height="130" rx="16" fill="#2a2410" stroke="#fcd34d" stroke-width="2"/>
+    <text x="1075" y="262" fill="#fef3c7" font-size="21" font-weight="700">6. Xóa</text>
+    <text x="1075" y="292" fill="#fde68a" font-size="16">container</text>
+    <text x="1075" y="314" fill="#fde68a" font-size="16">phải biến mất</text>
+  </g>
+
+  <g fill="none" stroke="#5eead4" stroke-width="3">
+    <path d="M202 285h20" marker-end="url(#arrow)"/>
+    <path d="M388 285h36" marker-end="url(#arrow)"/>
+    <path d="M590 285h20" marker-end="url(#arrow)"/>
+    <path d="M776 285h20" marker-end="url(#arrow)"/>
+    <path d="M952 285h34" marker-end="url(#arrow)"/>
+    <path d="M1075 352v58" marker-end="url(#arrow)"/>
+  </g>
+
+  <g font-family="Liberation Sans, sans-serif" filter="url(#shadow)">
+    <rect x="930" y="414" width="230" height="64" rx="14" fill="#14532d" stroke="#86efac" stroke-width="2"/>
+    <text x="1045" y="454" fill="#f0fdfa" font-size="21" font-weight="700" text-anchor="middle">SUCCEEDED</text>
+  </g>
+
+  <!-- Failure path -->
+  <path d="M694 352v80" fill="none" stroke="#fca5a5" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#arrow-red)"/>
+  <g font-family="Liberation Sans, sans-serif">
+    <rect x="300" y="440" width="560" height="150" rx="16" fill="#2a1414" stroke="#fca5a5" stroke-width="2"/>
+    <text x="324" y="476" fill="#fecaca" font-size="20" font-weight="700">Lỗi ở bất kỳ bước nào → lần verification FAILED</text>
+    <text x="324" y="508" fill="#fecaca" font-size="17">• Container vẫn được dọn theo tên suy ra từ UUID.</text>
+    <text x="324" y="536" fill="#fecaca" font-size="17">• Backup vẫn SUCCEEDED; retention không đổi.</text>
+    <text x="324" y="564" fill="#fecaca" font-size="17">• Thông báo riêng: VERIFICATION_FAILED.</text>
+  </g>
+</svg>
