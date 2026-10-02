@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-Đây là *bài 7* trong series microservices e-commerce, phần 2 (dữ liệu và sự kiện). Code của bài ở tag `blog-07`. Bài trước: link:/blog/2026/ecommerce-microservices-06-persistence/[MongoDB, MySQL và database-per-service].
+Đây là *bài 7* trong series microservices e-commerce, phần 2 (dữ liệu và sự kiện). Code của bài ở tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-07[`blog-07`]. Bài trước: link:/blog/2026/ecommerce-microservices-06-persistence/[MongoDB, MySQL và database-per-service].
 
 Bài này là phần *mở rộng*: sách chỉ có product, review, recommendation. Inventory và order là thứ một hệ thống e-commerce thật cần, và là nền cho saga đặt hàng ở bài 10.
 ====

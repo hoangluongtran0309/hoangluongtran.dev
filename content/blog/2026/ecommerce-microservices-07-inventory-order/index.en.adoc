@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-This is *part 7* of the e-commerce microservices series, part 2 (data and events). The code for this post is at tag `blog-07`. Previous post: link:/en/blog/2026/ecommerce-microservices-06-persistence/[MongoDB, MySQL and database per service].
+This is *part 7* of the e-commerce microservices series, part 2 (data and events). The code for this post is at tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-07[`blog-07`]. Previous post: link:/en/blog/2026/ecommerce-microservices-06-persistence/[MongoDB, MySQL and database per service].
 
 This post is an *extension*: the book only has product, review and recommendation. Inventory and order are what a real e-commerce system needs, and they are the foundation for the order saga in post 10.
 ====

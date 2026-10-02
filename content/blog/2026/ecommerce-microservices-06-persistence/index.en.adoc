@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-This is *part 6* of the e-commerce microservices series, and the first post of part 2 (data and events). The code for this post is at tag `blog-06`. Previous post: link:/en/blog/2026/ecommerce-microservices-05-openapi-swagger/[OpenAPI and Swagger UI].
+This is *part 6* of the e-commerce microservices series, and the first post of part 2 (data and events). The code for this post is at tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-06[`blog-06`]. Previous post: link:/en/blog/2026/ecommerce-microservices-05-openapi-swagger/[OpenAPI and Swagger UI].
 ====
 
 Up to post 5, every product was called `name-<id>` and cost 199,000, and there was no way to add a new one. This post gives each core service a real database, adds create and delete APIs, and tests all of it against real databases running in Docker.

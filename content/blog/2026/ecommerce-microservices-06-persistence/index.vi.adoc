@@ -9,7 +9,7 @@ draft: false
 
 [NOTE]
 ====
-Đây là *bài 6* trong series microservices e-commerce, bài đầu tiên của phần 2 (dữ liệu và sự kiện). Code của bài ở tag `blog-06`. Bài trước: link:/blog/2026/ecommerce-microservices-05-openapi-swagger/[OpenAPI và Swagger UI].
+Đây là *bài 6* trong series microservices e-commerce, bài đầu tiên của phần 2 (dữ liệu và sự kiện). Code của bài ở tag link:https://github.com/hoangluongtran0309/ecommerce-platform/tree/blog-06[`blog-06`]. Bài trước: link:/blog/2026/ecommerce-microservices-05-openapi-swagger/[OpenAPI và Swagger UI].
 ====
 
 Tới bài 5, mọi sản phẩm đều tên `name-<id>`, giá 199.000, và không có cách nào thêm sản phẩm mới. Bài này cho mỗi service lõi một database thật, thêm API tạo và xoá, và kiểm tra tất cả bằng test chạy trên database thật trong Docker.
