@@ -1,0 +1,354 @@
+---
+title: "Microservices e-commerce #2: service đầu tiên với Spring WebFlux"
+date: 2026-10-02T09:10:00+07:00
+tags: ["Java", "Spring Boot", "WebFlux", "Microservices", "Testing"]
+images: []
+summary: "Tạo product-service: controller viết từ interface dùng chung, Mono của Project Reactor, xử lý lỗi toàn cục, chạy thử bằng curl và kiểm thử với WebTestClient."
+draft: true
+---
+
+[NOTE]
+====
+Đây là *bài 2* trong series microservices e-commerce. Code của bài ở tag `blog-02`. Nếu chưa đọc, hãy xem link:/blog/2026/ecommerce-microservices-01-setup/[bài 1] để có khung Gradle và hai module `api`, `util`.
+====
+
+Bài trước mới có khung. Bài này ta có thứ chạy được đầu tiên: `product-service`, service quản lý catalog. Nó chưa có database (bài 6 mới thêm), nên dữ liệu được giả lập ngay trong code. Mục tiêu là nắm cách một microservice Spring Boot được dựng lên, trả lỗi ra sao, và được test thế nào.
+
+Cuối bài bạn sẽ có:
+
+* `product-service` chạy ở cổng 7001, trả về sản phẩm theo id.
+* Lỗi trả về đúng định dạng chung đã viết ở bài 1.
+* Bốn test tự động gọi API thật qua `WebTestClient`.
+
+== Tạo module
+
+Thêm vào `settings.gradle`:
+
+[source,groovy]
+----
+include ':microservices:product-service'
+----
+
+Tạo thư mục:
+
+[source,bash]
+----
+mkdir -p microservices/product-service/src/main/java/com/ecommerce/core/product/services
+mkdir -p microservices/product-service/src/main/resources
+mkdir -p microservices/product-service/src/test/java/com/ecommerce/core/product
+----
+
+[source,groovy]
+.microservices/product-service/build.gradle
+----
+apply plugin: 'org.springframework.boot' // <1>
+
+dependencies {
+    implementation project(':util')  // <2>
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+}
+
+jar {
+    enabled = false // <3>
+}
+----
+<1> Đây là service chạy được, nên áp plugin Spring Boot. Phiên bản đã khai ở `build.gradle` gốc.
+<2> Phụ thuộc `util`, và qua đó có luôn `api`.
+<3> Tắt task `jar` thường, chỉ giữ fat jar do `bootJar` tạo. Thư mục `build/libs` khi đó chỉ có một file, rất tiện cho Dockerfile ở bài 4.
+
+== Class main
+
+[source,java]
+.ProductServiceApplication.java
+----
+package com.ecommerce.core.product;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
+@SpringBootApplication
+@ComponentScan("com.ecommerce")
+public class ProductServiceApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ProductServiceApplication.class, args);
+    }
+}
+----
+
+`@ComponentScan("com.ecommerce")` là chỗ đã hẹn ở bài 1: không có dòng này, Spring chỉ quét `com.ecommerce.core.product` và bỏ sót `GlobalControllerExceptionHandler` nằm trong `com.ecommerce.util`. Hậu quả là lỗi vẫn trả về, nhưng theo định dạng mặc định của Spring chứ không phải `HttpErrorInfo` của ta.
+
+== Biết request được xử lý ở đâu: `ServiceUtil`
+
+Khi chạy nhiều instance của cùng một service, câu hỏi "request vừa rồi đi vào instance nào?" xuất hiện rất thường xuyên. Sách giải quyết bằng một trường `serviceAddress` trong mọi response. Thêm class này vào module `util`:
+
+[source,java]
+.util/src/main/java/com/ecommerce/util/http/ServiceUtil.java
+----
+package com.ecommerce.util.http;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+/** Trả về "hostname/ip:port" của instance, để biết request được xử lý ở đâu khi scale ra nhiều instance. */
+@Component
+public class ServiceUtil {
+
+    private final String port;
+    private String serviceAddress = null;
+
+    @Autowired
+    public ServiceUtil(@Value("${server.port}") String port) {
+        this.port = port;
+    }
+
+    public String getServiceAddress() {
+        if (serviceAddress == null) {
+            serviceAddress = findMyHostname() + "/" + findMyIpAddress() + ":" + port;
+        }
+        return serviceAddress;
+    }
+
+    private String findMyHostname() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            return "unknown host name";
+        }
+    }
+
+    private String findMyIpAddress() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            return "unknown IP address";
+        }
+    }
+}
+----
+
+== Controller: chỉ cần implement interface
+
+Vì `@GetMapping` đã nằm trên `ProductService` trong module `api`, controller không phải khai báo route nào cả:
+
+[source,java]
+.services/ProductServiceImpl.java
+----
+package com.ecommerce.core.product.services;
+
+import com.ecommerce.api.core.product.Product;
+import com.ecommerce.api.core.product.ProductService;
+import com.ecommerce.api.exceptions.InvalidInputException;
+import com.ecommerce.api.exceptions.NotFoundException;
+import com.ecommerce.util.http.ServiceUtil;
+import java.math.BigDecimal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+
+@RestController
+public class ProductServiceImpl implements ProductService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProductServiceImpl.class);
+
+    private final ServiceUtil serviceUtil;
+
+    public ProductServiceImpl(ServiceUtil serviceUtil) {
+        this.serviceUtil = serviceUtil;
+    }
+
+    @Override
+    public Mono<Product> getProduct(int productId) {
+        LOG.debug("/product return the found product for productId={}", productId);
+
+        if (productId < 1) {
+            throw new InvalidInputException("Invalid productId: " + productId);
+        }
+        // Chưa có database (bài 6), tạm giả lập: id 13 là sản phẩm không tồn tại.
+        if (productId == 13) {
+            throw new NotFoundException("No product found for productId: " + productId);
+        }
+
+        return Mono.just(new Product(productId, "name-" + productId, new BigDecimal("199000"),
+            serviceUtil.getServiceAddress()));
+    }
+}
+----
+
+Có hai quy ước giả lập sẽ dùng suốt phần 1 của series: id âm là đầu vào sai (422), id `13` là sản phẩm không tồn tại (404).
+
+=== `Mono` là gì, nói ngắn gọn
+
+WebFlux chạy trên Netty với một số ít thread xử lý rất nhiều request. Một handler không được phép ngồi chờ (block) database hay service khác, vì nó sẽ giữ luôn thread mà hàng trăm request khác đang cần. Thay vì trả về `Product`, handler trả về `Mono<Product>`: một lời hứa sẽ có _tối đa một_ sản phẩm. Với danh sách thì dùng `Flux<T>`: _0 đến N_ phần tử. Framework tự subscribe và ghi kết quả ra response khi dữ liệu sẵn sàng.
+
+Ở bài này dữ liệu có ngay nên `Mono.just(...)` là đủ. Sức mạnh thật của nó lộ ra ở bài 3, khi composite gọi ba service song song mà không tốn thêm thread nào.
+
+== Cấu hình
+
+[source,yaml]
+.src/main/resources/application.yml
+----
+server.port: 7001
+server.error.include-message: always
+
+spring.application.name: product
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce: DEBUG
+----
+
+Mỗi service có một cổng riêng khi chạy trên máy: composite là 7000, product 7001, recommendation 7002, review 7003. Khi vào Docker ở bài 4, tất cả sẽ dùng chung cổng 8080.
+
+== Chạy thử
+
+[source,bash]
+----
+./gradlew :microservices:product-service:bootRun
+----
+
+Ở terminal khác:
+
+[source,bash]
+----
+curl -s localhost:7001/product/1 | jq .
+----
+
+[source,json]
+----
+{
+  "productId": 1,
+  "name": "name-1",
+  "price": 199000,
+  "serviceAddress": "vm/127.0.0.1:7001"
+}
+----
+
+Thử các trường hợp lỗi:
+
+[source,bash]
+----
+$ curl -s localhost:7001/product/13
+{"timestamp":"2026-10-02T06:04:29.236922979Z","path":"/product/13","httpStatus":"NOT_FOUND","message":"No product found for productId: 13"}
+
+$ curl -s localhost:7001/product/-1
+{"timestamp":"2026-10-02T06:04:29.269305958Z","path":"/product/-1","httpStatus":"UNPROCESSABLE_ENTITY","message":"Invalid productId: -1"}
+
+$ curl -s localhost:7001/product/abc
+{"timestamp":"2026-10-02T06:04:29.299+00:00","path":"/product/abc","status":400,"error":"Bad Request","requestId":"e794e373-5","message":"Type mismatch."}
+----
+
+Để ý trường hợp cuối: định dạng JSON khác hẳn. `abc` không chuyển được thành `int`, lỗi xảy ra trước khi vào controller của ta, nên Spring trả về bằng bộ xử lý mặc định. Sách cũng để nguyên như vậy. Dòng `server.error.include-message: always` trong cấu hình là để trường `message` hiện ra trong trường hợp này.
+
+Actuator cho ta luôn endpoint health, sẽ rất cần ở bài 4 để biết container đã sẵn sàng chưa:
+
+[source,bash]
+----
+$ curl -s localhost:7001/actuator/health
+{"status":"UP"}
+----
+
+== Viết test với `WebTestClient`
+
+`@SpringBootTest(webEnvironment = RANDOM_PORT)` khởi động service thật trên một cổng ngẫu nhiên, và `WebTestClient` gọi vào đó như một client HTTP bình thường:
+
+[source,java]
+.src/test/java/com/ecommerce/core/product/ProductServiceApplicationTests.java
+----
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+class ProductServiceApplicationTests {
+
+    @Autowired
+    private WebTestClient client;
+
+    @Test
+    void getProductById() {
+        int productId = 1;
+
+        client.get()
+            .uri("/product/" + productId)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().contentType(APPLICATION_JSON)
+            .expectBody()
+            .jsonPath("$.productId").isEqualTo(productId)
+            .jsonPath("$.price").isEqualTo(199000);
+    }
+
+    @Test
+    void getProductInvalidParameterString() {
+        client.get()
+            .uri("/product/no-integer")
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isBadRequest()
+            .expectBody()
+            .jsonPath("$.path").isEqualTo("/product/no-integer");
+    }
+
+    @Test
+    void getProductNotFound() {
+        int productIdNotFound = 13;
+
+        client.get()
+            .uri("/product/" + productIdNotFound)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isEqualTo(NOT_FOUND)
+            .expectBody()
+            .jsonPath("$.path").isEqualTo("/product/" + productIdNotFound)
+            .jsonPath("$.message").isEqualTo("No product found for productId: " + productIdNotFound);
+    }
+
+    @Test
+    void getProductInvalidParameterNegativeValue() {
+        int productIdInvalid = -1;
+
+        client.get()
+            .uri("/product/" + productIdInvalid)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isEqualTo(UNPROCESSABLE_ENTITY)
+            .expectBody()
+            .jsonPath("$.message").isEqualTo("Invalid productId: " + productIdInvalid);
+    }
+}
+----
+
+Bốn test phủ đủ bốn nhánh: thành công, 400, 404 và 422. Chạy:
+
+[source,bash]
+----
+./gradlew :microservices:product-service:test
+----
+
+Kết quả là `BUILD SUCCESSFUL`. Báo cáo chi tiết nằm ở `microservices/product-service/build/reports/tests/test/index.html`.
+
+== Commit
+
+[source,bash]
+----
+git add .
+git commit -m "Bài 2: product-service với WebFlux"
+git tag blog-02
+----
+
+== Tổng kết
+
+* Một microservice Spring Boot cần rất ít code khi hợp đồng API đã nằm sẵn trong module `api`.
+* `@ComponentScan("com.ecommerce")` để nạp bộ xử lý lỗi dùng chung.
+* `Mono` và `Flux` là cách WebFlux trả kết quả mà không block thread.
+* `WebTestClient` cho phép test qua HTTP thật mà vẫn nhanh.
+
+Một service thì chưa phải microservices. Ở link:/blog/2026/ecommerce-microservices-03-composite-service/[bài 3], mình thêm `review`, `recommendation` và `product-composite`, service gọi ba service kia song song để dựng trang sản phẩm.

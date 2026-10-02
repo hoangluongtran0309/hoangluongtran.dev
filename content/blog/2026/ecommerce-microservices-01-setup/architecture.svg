@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Kiến trúc mục tiêu của nền tảng e-commerce</title>
+  <desc id="desc">Client đi qua Gateway có bảo vệ bằng Authorization Server. Gateway chuyển request tới product-composite và order-service. Product-composite gọi product, review và recommendation. Order, inventory và payment trao đổi event qua Kafka. Eureka giữ danh sách các service.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#16233a"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#7cc4ff"/>
+    </marker>
+    <marker id="arrowEv" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#f5b94a"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="700" rx="24" fill="url(#bg)"/>
+  <g font-family="Liberation Sans, sans-serif">
+    <text x="50" y="60" fill="#eef4ff" font-size="30" font-weight="700">Nền tảng e-commerce: kiến trúc mục tiêu</text>
+    <text x="50" y="94" fill="#9fb0c8" font-size="18">Xanh: gọi REST đồng bộ · Vàng: event qua Kafka · Nét đứt: hạ tầng Spring Cloud</text>
+
+    <!-- Client + gateway -->
+    <rect x="510" y="120" width="180" height="50" rx="12" fill="#1d2b45" stroke="#4a6a9a"/>
+    <text x="600" y="152" fill="#eef4ff" font-size="18" text-anchor="middle">Client</text>
+    <line x1="600" y1="170" x2="600" y2="208" stroke="#7cc4ff" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <rect x="480" y="212" width="240" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="600" y="240" fill="#eef4ff" font-size="19" font-weight="700" text-anchor="middle">Gateway</text>
+    <text x="600" y="262" fill="#9fb0c8" font-size="14" text-anchor="middle">HTTPS · cửa ngõ duy nhất</text>
+
+    <rect x="820" y="212" width="260" height="60" rx="12" fill="#1a2236" stroke="#6b7a96" stroke-dasharray="6 5"/>
+    <text x="950" y="240" fill="#eef4ff" font-size="17" text-anchor="middle">Authorization Server</text>
+    <text x="950" y="262" fill="#9fb0c8" font-size="14" text-anchor="middle">OAuth2 · JWT</text>
+    <line x1="720" y1="242" x2="815" y2="242" stroke="#6b7a96" stroke-width="2" stroke-dasharray="6 5"/>
+
+    <rect x="120" y="212" width="260" height="60" rx="12" fill="#1a2236" stroke="#6b7a96" stroke-dasharray="6 5"/>
+    <text x="250" y="240" fill="#eef4ff" font-size="17" text-anchor="middle">Eureka</text>
+    <text x="250" y="262" fill="#9fb0c8" font-size="14" text-anchor="middle">service discovery</text>
+    <line x1="380" y1="242" x2="475" y2="242" stroke="#6b7a96" stroke-width="2" stroke-dasharray="6 5"/>
+
+    <!-- composite branch -->
+    <line x1="540" y1="272" x2="330" y2="340" stroke="#7cc4ff" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <rect x="180" y="344" width="300" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="330" y="372" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">product-composite</text>
+    <text x="330" y="394" fill="#9fb0c8" font-size="14" text-anchor="middle">API trang sản phẩm</text>
+
+    <line x1="250" y1="404" x2="130" y2="470" stroke="#7cc4ff" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <line x1="330" y1="404" x2="330" y2="470" stroke="#7cc4ff" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <line x1="410" y1="404" x2="530" y2="470" stroke="#7cc4ff" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <g font-size="16" text-anchor="middle">
+      <rect x="50" y="474" width="170" height="70" rx="12" fill="#18263d" stroke="#4a6a9a"/>
+      <text x="135" y="504" fill="#eef4ff">product</text><text x="135" y="528" fill="#9fb0c8" font-size="13">MongoDB</text>
+      <rect x="245" y="474" width="170" height="70" rx="12" fill="#18263d" stroke="#4a6a9a"/>
+      <text x="330" y="504" fill="#eef4ff">review</text><text x="330" y="528" fill="#9fb0c8" font-size="13">MySQL</text>
+      <rect x="440" y="474" width="190" height="70" rx="12" fill="#18263d" stroke="#4a6a9a"/>
+      <text x="535" y="504" fill="#eef4ff">recommendation</text><text x="535" y="528" fill="#9fb0c8" font-size="13">MongoDB</text>
+    </g>
+
+    <!-- order branch -->
+    <line x1="660" y1="272" x2="850" y2="340" stroke="#7cc4ff" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <rect x="740" y="344" width="260" height="60" rx="12" fill="#14304d" stroke="#7cc4ff" stroke-width="2"/>
+    <text x="870" y="372" fill="#eef4ff" font-size="18" font-weight="700" text-anchor="middle">order-service</text>
+    <text x="870" y="394" fill="#9fb0c8" font-size="14" text-anchor="middle">MySQL · trạng thái đơn</text>
+
+    <rect x="700" y="452" width="440" height="44" rx="10" fill="#3a2a0e" stroke="#f5b94a" stroke-width="2"/>
+    <text x="920" y="480" fill="#ffe2a8" font-size="17" font-weight="700" text-anchor="middle">Kafka</text>
+    <line x1="870" y1="404" x2="870" y2="448" stroke="#f5b94a" stroke-width="2.5" marker-end="url(#arrowEv)"/>
+    <line x1="790" y1="496" x2="790" y2="560" stroke="#f5b94a" stroke-width="2.5" marker-start="url(#arrowEv)" marker-end="url(#arrowEv)"/>
+    <line x1="1050" y1="496" x2="1050" y2="560" stroke="#f5b94a" stroke-width="2.5" marker-start="url(#arrowEv)" marker-end="url(#arrowEv)"/>
+    <g font-size="16" text-anchor="middle">
+      <rect x="700" y="564" width="180" height="70" rx="12" fill="#18263d" stroke="#4a6a9a"/>
+      <text x="790" y="594" fill="#eef4ff">inventory</text><text x="790" y="618" fill="#9fb0c8" font-size="13">MySQL · giữ hàng</text>
+      <rect x="960" y="564" width="180" height="70" rx="12" fill="#18263d" stroke="#4a6a9a"/>
+      <text x="1050" y="594" fill="#eef4ff">payment</text><text x="1050" y="618" fill="#9fb0c8" font-size="13">thanh toán giả lập</text>
+    </g>
+    <text x="50" y="672" fill="#9fb0c8" font-size="15">Giai đoạn 0 và 1 của series chỉ làm phần bên trái: product-composite và ba service lõi.</text>
+  </g>
+</svg>
