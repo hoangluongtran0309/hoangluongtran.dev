@@ -59,7 +59,7 @@
   <!-- Frozen release note -->
   <g transform="translate(862 250)" filter="url(#glow)">
     <rect width="250" height="310" rx="16" fill="url(#note)" stroke="#c4b5fd" stroke-width="4"/>
-    <text x="28" y="54" fill="#1e1b4b" font-family="Liberation Sans, sans-serif" font-size="26" font-weight="700">v0.1.0</text>
+    <text x="28" y="54" fill="#1e1b4b" font-family="Liberation Sans, sans-serif" font-size="26" font-weight="700">v0.2.1</text>
     <rect x="28" y="82" width="120" height="12" rx="6" fill="#7c3aed"/>
     <rect x="28" y="112" width="194" height="10" rx="5" fill="#a78bfa"/>
     <rect x="28" y="136" width="170" height="10" rx="5" fill="#a78bfa"/>

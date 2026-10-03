@@ -8,8 +8,8 @@ ctaPrimary:
   label: "View source"
   url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator"
 ctaSecondary:
-  label: "See v0.1.0"
-  url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/tag/v0.1.0"
+  label: "See v0.2.1"
+  url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/tag/v0.2.1"
 draft: false
 ---
 
@@ -23,6 +23,17 @@ ReleaseFlow is an open-source web application (Apache-2.0) that helps a team wri
 * A separate note for each audience (operator, contributor, end user) through Mustache templates, in up to five languages via DeepL.
 * Automation that delivers a published note to GitHub Releases, Slack, email, Notion, Confluence, Microsoft Teams, Zendesk, and a public changelog with RSS.
 * Multi-tenant on one PostgreSQL schema, secrets encrypted with AES-256-GCM, and Prometheus metrics that never carry tenant information.
+* Try a release with nothing but Docker: every release ships `compose.yaml` (the image pinned by digest) and `quickstart.sh`, which generates the secrets, so there is no repository to clone. The JAR and image come with an SBOM, `SHA256SUMS`, and a provenance attestation to verify them.
+
+== Screenshots
+
+.Change Inbox: changes are classified by rules, and breaking or unrecognised changes wait for a reviewer
+image::/projects/releaseflow/04-change-inbox.jpg[alt="ReleaseFlow's Change Inbox with filters for project, category, status, and context, a Source sync panel for the acme/checkout-web repository, and change #109 labelled Feature and marked Needs review"]
+
+.A published release: one note per audience, locked as an immutable snapshot
+image::/projects/releaseflow/12-release-published.jpg[alt="The published release 1.4.0 page, naming who approved and published it, with Contributor, End user, and Operator tabs and the note's Markdown beside Copy and Download buttons"]
+
+The full https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/blob/main/docs/tour.md[screenshot tour] follows one release from an empty workspace to a note delivered by email, Slack, Notion, and a public changelog.
 
 == Technology
 
@@ -32,7 +43,7 @@ ReleaseFlow is a modular monolith: one Maven module and one JAR, with code packa
 
 == Current status
 
-v0.1.0 was released on 23 September 2026. It contains every slice of the original plan and 30 ADRs recording the architectural decisions. Some things are deliberately left out: changing roles or removing members, rotating secrets and tokens, paging and search in the Change Inbox, and correcting or withdrawing a published release note. The bundled Docker Compose stack is a demo environment, not a production configuration.
+The first version, v0.1.0, was released on 23 September 2026 with every slice of the original plan. The latest is v0.2.1 (3 October 2026): v0.1.1 fixes what running one whole release on the demo stack turned up, v0.2.0 adds the quickstart bundle, and the repository now holds 31 ADRs recording the architectural decisions. Some things are still deliberately left out: changing roles or removing members, rotating secrets and tokens, paging and search in the Change Inbox, and correcting or withdrawing a published release note. The quickstart and the demo Docker Compose stack are both for one machine, not a production configuration.
 
 == Article series
 
