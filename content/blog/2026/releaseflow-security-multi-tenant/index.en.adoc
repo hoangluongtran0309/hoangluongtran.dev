@@ -99,7 +99,7 @@ The rule worth remembering: *a path that proves itself with a signature may be e
 Security is not only about blocking incoming requests. ReleaseFlow calls out to many places, and many destination addresses are user input:
 
 * A Slack webhook URL is checked against the deployment's host allowlist, `hooks.slack.com` and `hooks.slack-gov.com` by default, both when it is saved and *before every delivery*.
-* Every outbound HTTP client sets `HttpClient.Redirect.NEVER` explicitly, including clients that had relied on the JDK default. A redirect cannot turn a Slack call into a call to the internal network.
+* Every outbound HTTP client sets `HttpClient.Redirect.NEVER` explicitly, including clients that had relied on the JDK default. A redirect cannot turn a Slack call into a call to the internal network. Since v0.1.1, a Slack webhook that answers with a redirect is recorded as `FAILED` instead of delivered: the redirect was never followed, so nothing was posted.
 * Each automation action's secret is encrypted with AAD made of the organization, rule, action, action type, and purpose. A run snapshots only the ciphertext, never the secret.
 * Run history stores only fixed error codes, never a provider's message or an exception, so tokens or sensitive data never end up in the database by accident. AI failures follow the same principle: one fixed, safe message.
 
@@ -121,6 +121,8 @@ A public repository means pull requests, build tooling, and base images can all 
 
 Every third-party action is pinned to a commit SHA, every base image to a digest, and command-line tools are checked against SHA-256 checksums. Workflows default to `contents: read`. The container runs as the non-root UID `65534`, and Docker Compose refuses to start until the database password, master key, and Grafana password are set.
 
+A release has to be verifiable too. Under ADR-0030, the Release workflow runs only from a `v<version>` tag that sits on `main` and matches the POM, then attaches the JAR, a CycloneDX SBOM of the image, `SHA256SUMS`, and a provenance attestation; the image on GHCR is referenced by digest. Since v0.2.0, the quickstart (ADR-0031) follows the same rules: `compose.yaml` pins the image by digest, and both files are listed in `SHA256SUMS` so people check them before running them instead of piping `curl` into `bash`. The script writes `.env` with new secrets on the first run and never overwrites it, ignores any `RELEASEFLOW_*` or `COMPOSE_*` variable from the shell, and refuses to start when the database exists but `.env` is gone, because new secrets cannot open data encrypted under the old master key.
+
 == Lessons to close the series
 
 *Write down the order of trust.* "Trust nothing until the signature matches" is simple enough to break by accident; the comments and line order in `receive` make it something a reviewer can check.
@@ -131,4 +133,4 @@ Every third-party action is pinned to a commit SHA, every base image to a digest
 
 *Fix warnings that are not exploitable.* Not out of fear, but because the code gets cleaner and leaves no bad pattern behind.
 
-Across these three articles, I hope ReleaseFlow shows one thing: most of a system's value is not in its flashiest feature, but in boundaries that are drawn clearly and defended at more than one layer. You can visit the link:/en/projects/releaseflow/[ReleaseFlow project page], read the https://github.com/hoangluongtran0309/ai-powered-release-notes-generator[source and all 30 ADRs on GitHub], or try https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/tag/v0.1.0[release v0.1.0] with Docker Compose. If you find a weakness, `SECURITY.md` in the repository explains how to report it privately.
+Across these three articles, I hope ReleaseFlow shows one thing: most of a system's value is not in its flashiest feature, but in boundaries that are drawn clearly and defended at more than one layer. You can visit the link:/en/projects/releaseflow/[ReleaseFlow project page], read the https://github.com/hoangluongtran0309/ai-powered-release-notes-generator[source and all 31 ADRs on GitHub], or try the https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/latest[latest release] with the Docker-only quickstart. If you find a weakness, `SECURITY.md` in the repository explains how to report it privately.
