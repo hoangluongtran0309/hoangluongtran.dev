@@ -8,8 +8,8 @@ ctaPrimary:
   label: "Xem mã nguồn"
   url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator"
 ctaSecondary:
-  label: "Xem v0.1.0"
-  url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/tag/v0.1.0"
+  label: "Xem v0.2.1"
+  url: "https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/tag/v0.2.1"
 draft: false
 ---
 
@@ -23,6 +23,17 @@ ReleaseFlow là ứng dụng web mã nguồn mở (Apache-2.0) giúp một team 
 * Một note riêng cho từng audience (operator, contributor, end user) bằng template Mustache, tối đa năm ngôn ngữ qua DeepL.
 * Automation giao note đã xuất bản tới GitHub Release, Slack, email, Notion, Confluence, Microsoft Teams, Zendesk và changelog công khai có RSS.
 * Multi-tenant trên một schema PostgreSQL, secret mã hóa AES-256-GCM, metrics Prometheus không bao giờ mang thông tin tenant.
+* Thử một bản phát hành chỉ cần Docker: mỗi release kèm `compose.yaml` (image pin theo digest) và `quickstart.sh` tự sinh secret, không cần clone repository. JAR và image đi kèm SBOM, `SHA256SUMS` và provenance attestation để kiểm chứng.
+
+== Giao diện
+
+.Change Inbox: change được phân loại bằng rule, change breaking hoặc chưa nhận diện được chờ người duyệt
+image::04-change-inbox.jpg[alt="Trang Change Inbox của ReleaseFlow với bộ lọc theo project, category, trạng thái và context, khung Source sync của repository acme/checkout-web, và change #109 gắn nhãn Feature đang ở trạng thái Needs review"]
+
+.Release đã xuất bản: mỗi audience một note, bị khóa thành snapshot bất biến
+image::12-release-published.jpg[alt="Trang release 1.4.0 đã xuất bản, ghi rõ người duyệt và người xuất bản, với các tab Contributor, End user, Operator và bản Markdown của note bên cạnh nút Copy và Download"]
+
+Toàn bộ https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/blob/main/docs/tour.md[tour bằng ảnh chụp màn hình] đi qua một release từ workspace trống đến note được giao tới email, Slack, Notion và changelog công khai.
 
 == Công nghệ
 
@@ -32,7 +43,7 @@ ReleaseFlow là một modular monolith: một Maven module, một file JAR, như
 
 == Trạng thái hiện tại
 
-Phiên bản v0.1.0 được phát hành ngày 23/09/2026, gồm toàn bộ các lát cắt trong kế hoạch ban đầu và 30 ADR ghi lại các quyết định kiến trúc. Một số phần được cố ý để lại: đổi vai trò hoặc xóa thành viên, xoay vòng secret và token, phân trang và tìm kiếm trong Change Inbox, cũng như sửa hoặc gỡ một release note đã xuất bản. Docker Compose đi kèm là môi trường demo, chưa phải cấu hình production.
+Bản đầu tiên, v0.1.0, được phát hành ngày 23/09/2026 với toàn bộ các lát cắt trong kế hoạch ban đầu. Bản mới nhất là v0.2.1 (03/10/2026): v0.1.1 sửa các lỗi phát hiện khi chạy trọn một release trên môi trường demo, v0.2.0 thêm quickstart bundle, và repository hiện có 31 ADR ghi lại các quyết định kiến trúc. Một số phần vẫn được cố ý để lại: đổi vai trò hoặc xóa thành viên, xoay vòng secret và token, phân trang và tìm kiếm trong Change Inbox, cũng như sửa hoặc gỡ một release note đã xuất bản. Quickstart và Docker Compose demo đều dành cho một máy, chưa phải cấu hình production.
 
 == Series bài viết
 

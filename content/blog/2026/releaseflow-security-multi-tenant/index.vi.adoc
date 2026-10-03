@@ -99,7 +99,7 @@ Quy tắc đáng nhớ nhất: *một path tự chứng minh bằng chữ ký c�
 Bảo mật không chỉ là chặn request vào. ReleaseFlow gọi ra rất nhiều nơi, và nhiều địa chỉ đích do người dùng nhập:
 
 * URL webhook Slack được đối chiếu với allowlist host của deployment, mặc định chỉ `hooks.slack.com` và `hooks.slack-gov.com`, cả lúc lưu lẫn *trước mỗi lần gửi*.
-* Mọi HTTP client gửi ra ngoài đặt `HttpClient.Redirect.NEVER` tường minh, kể cả những client trước đó dựa vào mặc định của JDK. Một redirect không thể biến lời gọi Slack thành lời gọi tới mạng nội bộ.
+* Mọi HTTP client gửi ra ngoài đặt `HttpClient.Redirect.NEVER` tường minh, kể cả những client trước đó dựa vào mặc định của JDK. Một redirect không thể biến lời gọi Slack thành lời gọi tới mạng nội bộ. Từ v0.1.1, webhook Slack trả về redirect được ghi là `FAILED` thay vì đã giao: redirect không được đi theo, nên thực ra chưa có gì được gửi.
 * Secret của mỗi automation action được mã hóa với AAD gồm tổ chức, rule, action, loại action và mục đích. Run chỉ snapshot ciphertext, không bao giờ snapshot secret.
 * Lịch sử run chỉ lưu mã lỗi cố định, không bao giờ lưu thông điệp từ nhà cung cấp hay exception, để không vô tình ghi token hoặc dữ liệu nhạy cảm vào database. Lỗi AI cũng theo cùng nguyên tắc: một thông điệp cố định và an toàn.
 
@@ -121,6 +121,8 @@ Repository công khai nghĩa là pull request, công cụ build và base image �
 
 Mọi action bên thứ ba được pin theo commit SHA, mọi base image theo digest, và các công cụ dòng lệnh được kiểm tra checksum SHA-256. Workflow mặc định chỉ có quyền `contents: read`. Container chạy dưới UID `65534` không phải root, và Docker Compose từ chối khởi động khi mật khẩu database, master key hay mật khẩu Grafana chưa được đặt.
 
+Bản phát hành cũng phải kiểm chứng được. ADR-0030 cho workflow Release chỉ chạy từ một tag `v<version>` nằm trên `main` và khớp với POM, rồi đính kèm JAR, SBOM CycloneDX của image, `SHA256SUMS` và provenance attestation; image trên GHCR được tham chiếu theo digest. Từ v0.2.0, quickstart (ADR-0031) dùng lại đúng các nguyên tắc đó: `compose.yaml` pin image theo digest, và cả hai file nằm trong `SHA256SUMS` để người dùng kiểm tra trước khi chạy thay vì `curl | bash`. Script ghi `.env` với secret mới ở lần chạy đầu và không bao giờ ghi đè nó, bỏ qua mọi biến `RELEASEFLOW_*` hay `COMPOSE_*` từ shell, và từ chối khởi động khi database còn mà `.env` đã mất, vì secret mới không mở được dữ liệu đã mã hóa bằng master key cũ.
+
 == Bài học khép lại series
 
 *Viết ra thứ tự tin tưởng.* "Không tin gì trước khi chữ ký khớp" đơn giản đến mức dễ vi phạm vô tình; comment và thứ tự dòng code trong `receive` biến nó thành thứ có thể review.
@@ -131,4 +133,4 @@ Mọi action bên thứ ba được pin theo commit SHA, mọi base image theo d
 
 *Xử lý cảnh báo không khai thác được.* Không phải vì sợ, mà vì code sạch hơn và không để lại mẫu xấu cho người sau.
 
-Qua ba bài, mình hy vọng ReleaseFlow cho thấy một điều: phần lớn giá trị của một hệ thống không nằm ở tính năng hào nhoáng nhất, mà ở những ranh giới được vạch rõ và được bảo vệ ở nhiều tầng. Bạn có thể xem link:/projects/releaseflow/[trang project ReleaseFlow], đọc https://github.com/hoangluongtran0309/ai-powered-release-notes-generator[mã nguồn và 30 ADR trên GitHub], hoặc thử https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/tag/v0.1.0[release v0.1.0] bằng Docker Compose. Nếu bạn tìm thấy điểm yếu, `SECURITY.md` trong repository hướng dẫn cách báo cáo riêng tư.
+Qua ba bài, mình hy vọng ReleaseFlow cho thấy một điều: phần lớn giá trị của một hệ thống không nằm ở tính năng hào nhoáng nhất, mà ở những ranh giới được vạch rõ và được bảo vệ ở nhiều tầng. Bạn có thể xem link:/projects/releaseflow/[trang project ReleaseFlow], đọc https://github.com/hoangluongtran0309/ai-powered-release-notes-generator[mã nguồn và 31 ADR trên GitHub], hoặc thử https://github.com/hoangluongtran0309/ai-powered-release-notes-generator/releases/latest[bản phát hành mới nhất] bằng quickstart chỉ cần Docker. Nếu bạn tìm thấy điểm yếu, `SECURITY.md` trong repository hướng dẫn cách báo cáo riêng tư.
