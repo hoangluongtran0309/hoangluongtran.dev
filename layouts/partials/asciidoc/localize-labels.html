@@ -1,0 +1,45 @@
+{{/*
+  Dịch các nhãn Asciidoctor tự sinh trong HTML đã render — caption đánh số
+  ("Figure 1.", "Table 1.", "Example 1.") và nhãn admonition ("Note",
+  "Warning"...) — sang chuỗi i18n của ngôn ngữ đang render. Nhận
+  dict "html" (.Content), trả về HTML qua `return` nên gọi được cả trong
+  {{ }} lẫn gán vào biến (layouts/blog/rss.xml).
+
+  Vì sao không dùng attribute `figure-caption`/`note-caption`... của
+  Asciidoctor: [markup.asciidocExt.attributes] là config chung cho mọi
+  ngôn ngữ. Đã thử khai [languages.vi.markup.asciidocExt.attributes] và
+  [languages.en.markup.asciidocExt.attributes] trên Hugo 0.164: Hugo nhận
+  key nhưng gộp thành 1 config global (ngôn ngữ khai sau đè ngôn ngữ
+  trước), nên VI và EN luôn ra cùng một nhãn. Khai attribute trong từng
+  file index.vi.adoc thì bài mới quên khai là âm thầm lẫn tiếng Anh lại.
+
+  EN đi qua cùng partial với nhãn tiếng Anh trong i18n/en.toml → output EN
+  giữ nguyên. Mẫu regex bám đúng markup Asciidoctor 2.x: caption nằm trong
+  div.title (hình, ví dụ) hoặc caption.title (bảng); nhãn admonition là
+  div.title nằm trong td.icon — cặp này chỉ có ở admonition nên không đụng
+  tới tiêu đề block tác giả tự đặt. safeHTML an toàn ở đây: .Content là
+  content do chính tác giả viết trong repo, không phải input người dùng.
+*/}}
+{{ $html := string .html }}
+
+{{ $captions := dict
+  "Figure" "asciidocFigureCaption"
+  "Table" "asciidocTableCaption"
+  "Example" "asciidocExampleCaption"
+}}
+{{ range $label, $key := $captions }}
+  {{ $html = replaceRE (printf `(<(?:div|caption) class="title">)%s (\d+)\.` $label) (printf "${1}%s ${2}." (i18n $key)) $html }}
+{{ end }}
+
+{{ $admonitions := dict
+  "Note" "asciidocNoteCaption"
+  "Tip" "asciidocTipCaption"
+  "Warning" "asciidocWarningCaption"
+  "Caution" "asciidocCautionCaption"
+  "Important" "asciidocImportantCaption"
+}}
+{{ range $label, $key := $admonitions }}
+  {{ $html = replaceRE (printf `(<td class="icon">\s*<div class="title">)%s(</div>)` $label) (printf "${1}%s${2}" (i18n $key)) $html }}
+{{ end }}
+
+{{ return (safeHTML $html) }}

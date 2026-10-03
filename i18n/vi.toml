@@ -111,3 +111,29 @@ other = "Chưa có bản dịch bài này"
 
 [languageSwitcherLabel]
 other = "Chọn ngôn ngữ"
+
+# Nhãn Asciidoctor tự sinh (caption đánh số + admonition) — thay trong HTML
+# đã render bởi layouts/partials/asciidoc/localize-labels.html, xem lý do ở đó.
+[asciidocFigureCaption]
+other = "Hình"
+
+[asciidocTableCaption]
+other = "Bảng"
+
+[asciidocExampleCaption]
+other = "Ví dụ"
+
+[asciidocNoteCaption]
+other = "Ghi chú"
+
+[asciidocTipCaption]
+other = "Mẹo"
+
+[asciidocWarningCaption]
+other = "Cảnh báo"
+
+[asciidocCautionCaption]
+other = "Thận trọng"
+
+[asciidocImportantCaption]
+other = "Quan trọng"

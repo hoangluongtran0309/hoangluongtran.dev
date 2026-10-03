@@ -54,7 +54,7 @@
     {{- end }}
     {{- range $pages }}
     {{- $marker := "@@RSSREL@@" -}}
-    {{- $content := .Content -}}
+    {{- $content := partial "asciidoc/localize-labels.html" (dict "html" .Content) -}}
     {{- $content = replaceRE ` (src|href)="` (printf " $1=\"%s" $marker) $content -}}
     {{- $content = replaceRE (printf `%s(https?://)` $marker) "$1" $content -}}
     {{- $content = replaceRE (printf `%s(//)` $marker) "$1" $content -}}

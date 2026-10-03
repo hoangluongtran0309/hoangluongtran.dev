@@ -11,7 +11,7 @@
   */}}
   <article class="content">
     <h1>{{ .Title }}</h1>
-    {{ .Content }}
+    {{ partial "asciidoc/localize-labels.html" (dict "html" .Content) }}
     {{ if eq .Section "projects" }}
       {{/*
         Pagination đồng bộ với homepage/blog list: cùng dùng .Paginate +
@@ -79,7 +79,7 @@
       <span class="recent-posts__count">{{ i18n "showingXofY" (dict "Count" (len $paginator.Pages) "Total" (len .Pages)) }}</span>
     </div>
 
-    {{ .Content }}
+    {{ partial "asciidoc/localize-labels.html" (dict "html" .Content) }}
 
     <ul class="post-list">
       {{ range $paginator.Pages }}
