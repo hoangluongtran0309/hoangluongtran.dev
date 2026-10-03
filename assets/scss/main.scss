@@ -1202,12 +1202,16 @@ main.container {
 
     // The "Note"/"Warning"/"Tip" text Asciidoctor renders — kept for
     // accessibility, restyled as a small uppercase label with a CSS-only
-    // icon glyph (no Font Awesome / icon-font dependency).
+    // icon glyph (no Font Awesome / icon-font dependency). Localized by
+    // partials/asciidoc/localize-labels.html; nowrap because the icon cell
+    // shrinks to min-content, which would split two-word labels such as
+    // "Ghi chú" / "Cảnh báo" onto two lines.
     .title {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
       margin-bottom: 0.3rem;
+      white-space: nowrap;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;

@@ -6,6 +6,6 @@
       <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "02 Jan 2006" }}</time>
     </p>
   {{ end }}
-  {{ .Content }}
+  {{ partial "asciidoc/localize-labels.html" (dict "html" .Content) }}
 </article>
 {{ end }}

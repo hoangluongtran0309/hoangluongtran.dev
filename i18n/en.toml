@@ -112,3 +112,29 @@ other = "Not translated yet"
 
 [languageSwitcherLabel]
 other = "Choose language"
+
+# Asciidoctor's generated labels (numbered captions + admonitions) — replaced
+# in the rendered HTML by layouts/partials/asciidoc/localize-labels.html.
+[asciidocFigureCaption]
+other = "Figure"
+
+[asciidocTableCaption]
+other = "Table"
+
+[asciidocExampleCaption]
+other = "Example"
+
+[asciidocNoteCaption]
+other = "Note"
+
+[asciidocTipCaption]
+other = "Tip"
+
+[asciidocWarningCaption]
+other = "Warning"
+
+[asciidocCautionCaption]
+other = "Caution"
+
+[asciidocImportantCaption]
+other = "Important"

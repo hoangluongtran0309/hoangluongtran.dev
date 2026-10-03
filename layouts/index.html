@@ -32,7 +32,7 @@
     {{ end }}
   {{ end }}
   <div class="hero__bio">
-    {{ .Content }}
+    {{ partial "asciidoc/localize-labels.html" (dict "html" .Content) }}
   </div>
 </section>
 
